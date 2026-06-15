@@ -7,204 +7,185 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐟</text></svg>">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --coral:#ff7a8a; --amber:#ffc93c; --sky:#5ec5ff; --mint:#4fd1b5; --violet:#b794f6;
-      --ink:#38415a; --ink-soft:#8a93ab; --line:#eef1f7;
-    }
+    :root { --coral:#ff7a8a; --amber:#ffc93c; --sky:#5ec5ff; --mint:#4fd1b5; --violet:#b794f6; --ink:#38415a; --ink-soft:#8a93ab; --line:#eef1f7; }
+    html, body { height:100%; }
     body {
-      font-family: 'Hiragino Maru Gothic ProN','Rounded Mplus 1c','Quicksand',system-ui,sans-serif;
-      min-height:100vh; background:#f7f9fc;
+      font-family:'Hiragino Maru Gothic ProN','Rounded Mplus 1c','Quicksand',system-ui,sans-serif;
+      background:#f7f9fc;
       background-image:
-        radial-gradient(ellipse at 8% 0%,   #ffe3ec 0%, transparent 40%),
-        radial-gradient(ellipse at 92% 6%,  #d8f3ff 0%, transparent 38%),
-        radial-gradient(ellipse at 50% 100%,#d6fff0 0%, transparent 45%),
-        radial-gradient(ellipse at 88% 96%, #fff4d6 0%, transparent 40%);
-      display:flex; flex-direction:column; align-items:center; padding:2.5rem 1rem 3rem; color:var(--ink);
+        radial-gradient(ellipse at 8% 0%,#ffe3ec 0%,transparent 40%),
+        radial-gradient(ellipse at 92% 6%,#d8f3ff 0%,transparent 38%),
+        radial-gradient(ellipse at 50% 100%,#d6fff0 0%,transparent 45%),
+        radial-gradient(ellipse at 88% 96%,#fff4d6 0%,transparent 40%);
+      color:var(--ink); height:100vh; overflow:hidden; display:flex; flex-direction:column;
     }
-    .header { text-align:center; margin-bottom:1.6rem; }
-    .fish-mark { width:64px; height:64px; display:block; margin:0 auto 0.4rem; animation:floatBob 3s ease-in-out infinite; }
-    h1 {
-      font-size:2rem; font-weight:800; letter-spacing:0.01em;
-      background:linear-gradient(100deg,var(--coral) 0%,var(--amber) 35%,var(--mint) 65%,var(--sky) 100%);
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
-      animation:titleBounce 0.6s cubic-bezier(.36,.07,.19,.97) both;
-    }
-    @keyframes titleBounce { 0%{transform:scale(0.8);opacity:0} 70%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
-    .subtitle { color:var(--ink-soft); font-size:0.9rem; margin-top:0.35rem; letter-spacing:0.02em; }
-
-    /* 言語トグル(こども/おとな) — 右上に固定 */
-    .lang-toggle { position:fixed; top:14px; right:14px; z-index:50; display:inline-flex; background:#fff; border:1px solid var(--line); border-radius:99px; padding:3px; gap:3px; box-shadow:0 3px 14px rgba(56,65,90,0.14); }
-    .lang-btn { border:none; background:transparent; padding:0.35rem 0.85rem; border-radius:99px; font-weight:800; font-size:0.8rem; color:var(--ink-soft); cursor:pointer; font-family:inherit; transition:all 0.2s; }
-    .lang-btn.active { background:#eef1f7; color:var(--ink); }
-
-    /* モード(=どちらのAI)見出し */
-    .mode-head { display:none; text-align:center; font-size:0.82rem; font-weight:800; color:var(--ink-soft); margin-top:1.3rem; margin-bottom:-0.2rem; }
-    .mode-head.show { display:block; }
-
-    .nav-link {
-      display:inline-block; margin-top:0.8rem; color:var(--ink);
-      font-size:0.86rem; font-weight:800; text-decoration:none; background:#f3fffb; border:2px solid var(--mint);
-      border-radius:99px; padding:0.45rem 1.3rem; transition:all 0.2s; box-shadow:0 3px 12px rgba(79,209,181,0.22);
-    }
-    .nav-link:hover { background:#e8fff8; border-color:var(--mint); transform:translateY(-1px); box-shadow:0 6px 18px rgba(79,209,181,0.32); }
-
-    .card {
-      position:relative; background:#fff; border-radius:30px; padding:2rem; width:100%; max-width:480px;
-      box-shadow:0 16px 48px rgba(56,65,90,0.10),0 3px 10px rgba(56,65,90,0.04); border:1px solid var(--line); overflow:hidden;
-    }
-    .card::before { content:''; position:absolute; top:0; left:0; right:0; height:6px; background:linear-gradient(90deg,var(--coral),var(--amber),var(--mint),var(--sky),var(--violet)); }
-    /* ── ダッシュボード(2カラム) ── */
-    .dashboard { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,0.85fr); gap:1.2rem; width:100%; max-width:1120px; align-items:start; }
-    .panel { position:relative; background:#fff; border-radius:26px; padding:1.6rem; box-shadow:0 12px 40px rgba(56,65,90,0.09); border:1px solid var(--line); overflow:hidden; }
-    .panel::before { content:''; position:absolute; top:0; left:0; right:0; height:5px; background:linear-gradient(90deg,var(--coral),var(--amber),var(--mint),var(--sky),var(--violet)); }
-    .panel-judge { grid-column:1; grid-row:1; }
-    .panel-map { grid-column:2; grid-row:1; }
-    .panel-analysis { grid-column:1 / -1; grid-row:2; }
-    @media (max-width:820px) { .dashboard { grid-template-columns:1fr; } .panel-judge,.panel-map,.panel-analysis { grid-column:1; grid-row:auto; } }
-
-    /* ── 埋め込み地図パネル ── */
-    .map-title { font-weight:800; font-size:1rem; text-align:center; color:var(--ink); }
-    .map-desc { font-size:0.8rem; color:var(--ink-soft); text-align:center; line-height:1.6; margin:0.4rem 0 0.9rem; }
-    .make-map-btn { display:block; width:100%; padding:0.8rem; font-size:1rem; font-weight:800; color:#fff; font-family:inherit; background:linear-gradient(120deg,var(--mint),var(--sky)); border:none; border-radius:99px; cursor:pointer; box-shadow:0 6px 18px rgba(79,209,181,0.32); margin-bottom:0.8rem; transition:all 0.2s; }
-    .make-map-btn:hover { transform:translateY(-2px); } .make-map-btn:disabled { opacity:0.55; cursor:not-allowed; transform:none; }
-    .map-legend { display:flex; gap:1.2rem; justify-content:center; font-size:0.8rem; font-weight:700; margin-bottom:0.6rem; }
-    .map-dot { display:inline-block; width:11px; height:11px; border-radius:50%; margin-right:5px; vertical-align:middle; }
-    #network { width:100%; height:360px; border:1px solid var(--line); border-radius:14px; background:#fbfcfe; }
-    .map-status { font-size:0.8rem; color:var(--ink-soft); text-align:center; margin-top:0.6rem; min-height:1.2em; }
-    .map-note { font-size:0.74rem; color:var(--ink-soft); line-height:1.6; margin-top:0.6rem; background:#fbfcfe; border:1px solid var(--line); border-radius:12px; padding:0.55rem 0.8rem; text-align:left; }
-
-    .bubble-deco { position:absolute; border-radius:50%; opacity:0.5; pointer-events:none; }
-    .bubble-deco.b1 { width:70px; height:70px; background:#ffe3ec; top:30px; right:-22px; }
-    .bubble-deco.b2 { width:44px; height:44px; background:#d8f3ff; bottom:24px; left:-16px; }
-
-    .model-badge-wrap { position:relative; z-index:1; text-align:center; margin-bottom:1rem; }
-    .model-badge { display:inline-block; font-size:0.78rem; font-weight:800; padding:0.32rem 0.95rem; border-radius:99px; background:#eef1f7; color:var(--ink); }
-    .reset-bundle-btn { font-size:0.72rem; font-weight:700; padding:0.32rem 0.85rem; border-radius:99px; border:1.5px solid var(--line); background:#fff; color:var(--ink-soft); cursor:pointer; font-family:inherit; margin-left:0.4rem; }
-    .reset-bundle-btn:hover { border-color:var(--coral); color:var(--coral); }
-
-    .upload-area { position:relative; z-index:1; border:2.5px dashed #d8deea; border-radius:22px; padding:2.2rem 1.5rem; text-align:center; cursor:pointer; background:#fbfcfe; transition:all 0.25s; }
-    .upload-area:hover, .upload-area.dragover { border-color:var(--mint); background:#f3fffb; box-shadow:0 0 0 5px rgba(79,209,181,0.10); }
-    .upload-area input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; }
-    .upload-icon { font-size:3rem; margin-bottom:0.4rem; display:block; animation:floatBob 2.4s ease-in-out infinite; }
     @keyframes floatBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
-    .upload-text { color:var(--ink-soft); font-size:0.92rem; line-height:1.7; }
+    @keyframes popIn { 0%{transform:scale(0.85);opacity:0} 65%{transform:scale(1.04)} 100%{transform:scale(1);opacity:1} }
+    @keyframes titleBounce { 0%{transform:scale(0.8);opacity:0} 70%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
 
-    .mode-toggle { display:none; margin-top:0.5rem; background:#eef1f7; border-radius:99px; padding:4px; gap:4px; position:relative; z-index:1; }
-    .mode-toggle.show { display:flex; }
-    .mode-btn { flex:1; border:none; background:transparent; padding:0.6rem 0.4rem; border-radius:99px; font-weight:800; font-size:0.9rem; color:var(--ink-soft); cursor:pointer; font-family:inherit; transition:all 0.2s; }
+    /* ── ウェルカム(初回だけ) ── */
+    .welcome { position:fixed; inset:0; z-index:200; display:flex; align-items:center; justify-content:center; background:#f7f9fc;
+      background-image:radial-gradient(ellipse at 12% 0%,#ffe3ec 0%,transparent 42%),radial-gradient(ellipse at 88% 100%,#d8f3ff 0%,transparent 42%),radial-gradient(ellipse at 50% 60%,#fff4d6 0%,transparent 55%);
+      transition:opacity 0.5s ease; }
+    .welcome.hide { opacity:0; pointer-events:none; }
+    .welcome-inner { text-align:center; animation:popIn 0.6s both; padding:1rem; }
+    .welcome .fish-mark { width:120px; height:120px; margin:0 auto 1rem; animation:floatBob 3s ease-in-out infinite; }
+    .welcome h1 { font-size:clamp(2rem,7vw,3rem); font-weight:800; background:linear-gradient(100deg,var(--coral),var(--amber) 35%,var(--mint) 65%,var(--sky)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .welcome .subtitle { color:var(--ink-soft); font-size:1.05rem; margin:0.6rem 0 2.2rem; }
+    .w-start { font-size:1.3rem; font-weight:800; color:#fff; font-family:inherit; background:linear-gradient(120deg,var(--coral),var(--amber)); border:none; border-radius:99px; padding:1rem 3rem; cursor:pointer; box-shadow:0 10px 30px rgba(255,122,138,0.4),0 2px 0 #ec5e70; transition:all 0.2s; }
+    .w-start:hover { transform:translateY(-2px); box-shadow:0 14px 38px rgba(255,122,138,0.5),0 2px 0 #ec5e70; }
+
+    /* ── トップバー(細い1行) ── */
+    .topbar { flex:0 0 auto; display:flex; align-items:center; gap:0.7rem; width:100%; max-width:1200px; margin:0 auto; padding:0.6rem 1.1rem; }
+    .tb-logo { font-size:1.5rem; line-height:1; }
+    .tb-title { font-weight:800; font-size:1rem; color:var(--ink); white-space:nowrap; }
+    .tb-spacer { flex:1 1 auto; }
+    .tb-group { display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap; justify-content:flex-end; }
+    .lang-toggle { display:inline-flex; background:#fff; border:1px solid var(--line); border-radius:99px; padding:3px; gap:3px; box-shadow:0 2px 8px rgba(56,65,90,0.1); }
+    .lang-btn { border:none; background:transparent; padding:0.3rem 0.7rem; border-radius:99px; font-weight:800; font-size:0.76rem; color:var(--ink-soft); cursor:pointer; font-family:inherit; transition:all 0.2s; }
+    .lang-btn.active { background:#eef1f7; color:var(--ink); }
+    .mode-toggle { display:flex; background:#eef1f7; border-radius:99px; padding:3px; gap:3px; }
+    .mode-btn { border:none; background:transparent; padding:0.35rem 0.85rem; border-radius:99px; font-weight:800; font-size:0.8rem; color:var(--ink-soft); cursor:pointer; font-family:inherit; transition:all 0.2s; white-space:nowrap; }
     .mode-btn.active { background:#fff; color:var(--ink); box-shadow:0 2px 8px rgba(56,65,90,0.12); }
     .mode-btn:disabled { opacity:0.4; cursor:not-allowed; }
+    .model-badge { display:inline-block; font-size:0.74rem; font-weight:800; padding:0.3rem 0.8rem; border-radius:99px; background:#eef1f7; color:var(--ink); white-space:nowrap; }
+    .reset-bundle-btn { font-size:0.7rem; font-weight:700; padding:0.3rem 0.7rem; border-radius:99px; border:1.5px solid var(--line); background:#fff; color:var(--ink-soft); cursor:pointer; font-family:inherit; }
+    .reset-bundle-btn:hover { border-color:var(--coral); color:var(--coral); }
+    .nav-link { color:var(--ink); font-size:0.74rem; font-weight:800; text-decoration:none; background:#f3fffb; border:2px solid var(--mint); border-radius:99px; padding:0.3rem 0.85rem; white-space:nowrap; }
+    .nav-link:hover { background:#e8fff8; }
 
-    #preview-wrap { display:none; margin-top:1.2rem; text-align:center; position:relative; z-index:1; }
-    #preview-wrap-inner { position:relative; display:inline-block; max-width:100%; }
-    #preview { max-width:100%; max-height:min(480px,52vh); border-radius:18px; box-shadow:0 8px 28px rgba(56,65,90,0.16); object-fit:contain; display:block; border:4px solid #fff; }
-    #heatmap-canvas { display:none; position:absolute; top:0; left:0; width:100%; height:100%; border-radius:14px; pointer-events:none; opacity:0.7; }
-
-    .heatmap-info { margin-top:0.8rem; font-size:0.82rem; color:var(--ink-soft); }
-    .heatmap-legend { margin-bottom:0.5rem; line-height:1.9; font-weight:700; color:var(--ink); }
-    .heatmap-note { font-size:0.74rem; color:var(--ink-soft); line-height:1.6; background:#fbfcfe; border:1px solid var(--line); border-radius:12px; padding:0.55rem 0.8rem; margin-bottom:0.5rem; text-align:left; }
-    .toggle-heatmap-btn { background:#fff; border:2px solid var(--line); color:var(--ink); border-radius:99px; padding:0.35rem 1.1rem; font-size:0.8rem; font-weight:700; cursor:pointer; transition:all 0.18s; font-family:inherit; }
-    .toggle-heatmap-btn:hover { border-color:var(--sky); box-shadow:0 2px 10px rgba(94,197,255,0.18); }
-
-    #judge-btn {
-      display:none; position:relative; z-index:1; margin-top:1.3rem; width:100%; padding:1.05rem;
-      font-size:1.2rem; font-weight:800; letter-spacing:0.04em; color:#fff;
-      background:linear-gradient(120deg,var(--coral),var(--amber)); border:none; border-radius:99px; cursor:pointer; transition:all 0.2s;
-      box-shadow:0 8px 22px rgba(255,122,138,0.40),0 2px 0 #ec5e70; font-family:inherit;
+    /* ── ダッシュボード(1画面グリッド) ── */
+    .dashboard { flex:1 1 auto; min-height:0; display:grid; grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); grid-template-rows:1fr 1fr; gap:0.9rem; width:100%; max-width:1200px; margin:0 auto; padding:0 1.1rem 1rem; }
+    .panel { position:relative; background:#fff; border-radius:22px; padding:1.3rem; box-shadow:0 10px 34px rgba(56,65,90,0.09); border:1px solid var(--line); overflow-y:auto; min-height:0; }
+    .panel::before { content:''; position:absolute; top:0; left:0; right:0; height:5px; background:linear-gradient(90deg,var(--coral),var(--amber),var(--mint),var(--sky),var(--violet)); border-radius:22px 22px 0 0; }
+    .panel-judge { grid-column:1; grid-row:1 / 3; }
+    .panel-map { grid-column:2; grid-row:1; }
+    .panel-analysis { grid-column:2; grid-row:2; }
+    @media (max-width:860px) {
+      body { height:auto; overflow:auto; }
+      .dashboard { grid-template-columns:1fr; grid-template-rows:auto; }
+      .panel-judge,.panel-map,.panel-analysis { grid-column:1; grid-row:auto; }
     }
-    #judge-btn:hover { transform:translateY(-2px); box-shadow:0 12px 30px rgba(255,122,138,0.50),0 2px 0 #ec5e70; }
-    #judge-btn:active { transform:translateY(1px); box-shadow:0 4px 14px rgba(255,122,138,0.35); }
-    #judge-btn:disabled { opacity:0.55; cursor:not-allowed; transform:none; }
 
-    #result { display:none; margin-top:1.8rem; text-align:center; position:relative; z-index:1; animation:popIn 0.45s cubic-bezier(.36,.07,.19,.97) both; }
-    @keyframes popIn { 0%{transform:scale(0.8);opacity:0} 65%{transform:scale(1.06)} 100%{transform:scale(1);opacity:1} }
-    .result-badge { font-size:4.2rem; line-height:1; }
-    .result-badge.yes { animation:wiggle 0.5s ease 0.35s both; }
+    /* ── 判定パネル ── */
+    .upload-area { border:2.5px dashed #d8deea; border-radius:18px; padding:1.8rem 1.2rem; text-align:center; cursor:pointer; background:#fbfcfe; transition:all 0.25s; }
+    .upload-area:hover, .upload-area.dragover { border-color:var(--mint); background:#f3fffb; box-shadow:0 0 0 5px rgba(79,209,181,0.10); }
+    .upload-area input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; }
+    .upload-area { position:relative; }
+    .upload-icon { font-size:2.6rem; margin-bottom:0.3rem; display:block; animation:floatBob 2.4s ease-in-out infinite; }
+    .upload-text { color:var(--ink-soft); font-size:0.9rem; line-height:1.7; }
+
+    #preview-wrap { display:none; text-align:center; }
+    #preview-wrap-inner { position:relative; display:inline-block; max-width:100%; }
+    #preview { max-width:100%; max-height:min(440px,46vh); border-radius:16px; box-shadow:0 8px 28px rgba(56,65,90,0.16); object-fit:contain; display:block; border:4px solid #fff; }
+    #heatmap-canvas { display:none; position:absolute; top:0; left:0; width:100%; height:100%; border-radius:12px; pointer-events:none; opacity:0.7; }
+    .heatmap-info { margin-top:0.7rem; font-size:0.8rem; color:var(--ink-soft); }
+    .heatmap-legend { margin-bottom:0.4rem; line-height:1.8; font-weight:700; color:var(--ink); }
+    .heatmap-note { font-size:0.72rem; color:var(--ink-soft); line-height:1.6; background:#fbfcfe; border:1px solid var(--line); border-radius:10px; padding:0.5rem 0.7rem; margin-bottom:0.4rem; text-align:left; }
+    .toggle-heatmap-btn { background:#fff; border:2px solid var(--line); color:var(--ink); border-radius:99px; padding:0.3rem 1rem; font-size:0.78rem; font-weight:700; cursor:pointer; font-family:inherit; }
+
+    #judge-btn { display:none; margin-top:1rem; width:100%; padding:0.95rem; font-size:1.15rem; font-weight:800; color:#fff; background:linear-gradient(120deg,var(--coral),var(--amber)); border:none; border-radius:99px; cursor:pointer; transition:all 0.2s; box-shadow:0 8px 22px rgba(255,122,138,0.40),0 2px 0 #ec5e70; font-family:inherit; }
+    #judge-btn:hover { transform:translateY(-2px); } #judge-btn:disabled { opacity:0.55; cursor:not-allowed; transform:none; }
+
+    #result { display:none; text-align:center; margin-top:1rem; animation:popIn 0.45s both; }
+    .result-badge { font-size:3.6rem; line-height:1; }
+    .result-badge.yes { animation:wiggle 0.5s ease 0.3s both; }
     @keyframes wiggle { 0%,100%{transform:rotate(0)} 25%{transform:rotate(-8deg)} 50%{transform:rotate(8deg)} 75%{transform:rotate(-4deg)} }
-    .result-verdict { font-size:1.6rem; font-weight:800; margin-top:0.4rem; }
-    .result-verdict.yes { color:var(--coral); }
-    .result-verdict.maybe { color:#e6a700; }
-    .result-verdict.no { color:var(--sky); }
-
-    .meter-wrap { margin-top:1.5rem; background:#fbfcfe; border:1px solid var(--line); border-radius:18px; padding:1rem 1.1rem; }
-    .meter-top { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.55rem; }
-    .meter-title { font-size:0.82rem; font-weight:700; color:var(--ink-soft); }
-    .meter-text { font-size:1.05rem; font-weight:800; color:var(--ink); }
-    .bar-bg { background:#eef1f7; border-radius:99px; height:16px; overflow:hidden; }
+    .result-verdict { font-size:1.4rem; font-weight:800; margin-top:0.3rem; }
+    .result-verdict.yes { color:var(--coral); } .result-verdict.maybe { color:#e6a700; } .result-verdict.no { color:var(--sky); }
+    .meter-wrap { margin-top:1rem; background:#fbfcfe; border:1px solid var(--line); border-radius:16px; padding:0.9rem 1rem; }
+    .meter-top { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.5rem; }
+    .meter-title { font-size:0.8rem; font-weight:700; color:var(--ink-soft); }
+    .meter-text { font-size:1rem; font-weight:800; color:var(--ink); }
+    .bar-bg { background:#eef1f7; border-radius:99px; height:14px; overflow:hidden; }
     .bar-fill { height:100%; border-radius:99px; width:0%; transition:width 0.9s cubic-bezier(.22,.68,0,1.2); background:linear-gradient(90deg,var(--amber),var(--coral)); }
-    .bar-fill.mid { background:linear-gradient(90deg,#ffe08a,var(--amber)); }
-    .bar-fill.low { background:linear-gradient(90deg,var(--sky),var(--violet)); }
-    .percent-big { font-size:2.6rem; font-weight:800; margin-top:0.5rem; letter-spacing:-0.03em; color:var(--ink); }
-
-    #judge-card { display:none; margin-top:1.5rem; text-align:left; }
-    .jc-title { font-weight:800; font-size:0.98rem; margin-bottom:0.9rem; color:var(--ink); text-align:center; }
-    .jc-row { margin-bottom:0.7rem; padding:0.65rem 0.8rem; border:1px solid var(--line); border-radius:14px; background:#fff; transition:opacity 0.35s; }
-    .jc-row.dim { opacity:0.38; }
-    .jc-row.place { opacity:0.55; background:#fbfcfe; }
-    .jc-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.45rem; }
-    .jc-name { font-weight:800; font-size:0.88rem; }
-    .jc-eff { font-size:0.72rem; font-weight:800; padding:0.18rem 0.65rem; border-radius:99px; background:#eef1f7; color:var(--ink-soft); white-space:nowrap; }
-    .jc-eff.strong { background:linear-gradient(90deg,var(--coral),var(--amber)); color:#fff; }
-    .jc-bar-label { font-size:0.74rem; color:var(--ink-soft); margin-bottom:0.25rem; }
-    .jc-bar-label b { color:var(--ink); }
-    .jc-bar-bg { height:11px; background:#eef1f7; border-radius:99px; overflow:hidden; }
-    .jc-bar-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--mint),var(--sky)); width:0%; transition:width 0.8s cubic-bezier(.22,.68,0,1.2); }
-
-    #brain-section { display:none; margin-top:1.5rem; }
-    .brain-title { font-weight:800; font-size:0.95rem; text-align:center; color:var(--ink); margin-bottom:0.5rem; }
-    #brain-canvas { width:100%; display:block; background:#fbfcfe; border:1px solid var(--line); border-radius:16px; }
-    .brain-cap { font-size:0.74rem; color:var(--ink-soft); text-align:center; margin-top:0.4rem; line-height:1.6; }
-
-    .reset-btn { margin-top:1.4rem; background:#fff; border:2px solid var(--line); color:var(--ink-soft); border-radius:99px; padding:0.55rem 1.9rem; cursor:pointer; font-size:0.92rem; font-weight:700; transition:all 0.2s; font-family:inherit; }
-    .reset-btn:hover { border-color:var(--coral); color:var(--coral); transform:translateY(-1px); }
-
-    #status { margin-top:1.1rem; font-size:0.85rem; color:var(--ink-soft); text-align:center; min-height:1.3em; position:relative; z-index:1; }
+    .bar-fill.mid { background:linear-gradient(90deg,#ffe08a,var(--amber)); } .bar-fill.low { background:linear-gradient(90deg,var(--sky),var(--violet)); }
+    .percent-big { font-size:2.2rem; font-weight:800; margin-top:0.4rem; color:var(--ink); }
+    .reset-btn { margin-top:1rem; background:#fff; border:2px solid var(--line); color:var(--ink-soft); border-radius:99px; padding:0.5rem 1.7rem; cursor:pointer; font-size:0.9rem; font-weight:700; font-family:inherit; }
+    .reset-btn:hover { border-color:var(--coral); color:var(--coral); }
+    #status { margin-top:0.9rem; font-size:0.82rem; color:var(--ink-soft); text-align:center; min-height:1.2em; }
     #status a { color:var(--coral); font-weight:700; }
     .loading-dots::after { content:''; animation:dots 1.2s steps(4,end) infinite; }
     @keyframes dots { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
+
+    /* ── 地図パネル ── */
+    .panel-title { font-weight:800; font-size:0.95rem; text-align:center; color:var(--ink); }
+    .map-desc { font-size:0.76rem; color:var(--ink-soft); text-align:center; line-height:1.5; margin:0.3rem 0 0.7rem; }
+    .make-map-btn { display:block; width:100%; padding:0.65rem; font-size:0.92rem; font-weight:800; color:#fff; font-family:inherit; background:linear-gradient(120deg,var(--mint),var(--sky)); border:none; border-radius:99px; cursor:pointer; box-shadow:0 5px 16px rgba(79,209,181,0.3); margin-bottom:0.6rem; }
+    .make-map-btn:hover { transform:translateY(-2px); } .make-map-btn:disabled { opacity:0.55; cursor:not-allowed; transform:none; }
+    .map-legend { display:flex; gap:1rem; justify-content:center; font-size:0.76rem; font-weight:700; margin-bottom:0.5rem; }
+    .map-dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:4px; vertical-align:middle; }
+    #network { width:100%; height:260px; border:1px solid var(--line); border-radius:12px; background:#fbfcfe; }
+    .map-status { font-size:0.76rem; color:var(--ink-soft); text-align:center; margin-top:0.5rem; min-height:1.1em; }
+    .map-note { font-size:0.7rem; color:var(--ink-soft); line-height:1.55; margin-top:0.5rem; background:#fbfcfe; border:1px solid var(--line); border-radius:10px; padding:0.5rem 0.7rem; text-align:left; }
+
+    /* ── 分析パネル ── */
+    #judge-card { display:none; text-align:left; }
+    .jc-title { font-weight:800; font-size:0.92rem; margin-bottom:0.7rem; color:var(--ink); text-align:center; }
+    .jc-row { margin-bottom:0.55rem; padding:0.55rem 0.7rem; border:1px solid var(--line); border-radius:12px; background:#fff; transition:opacity 0.35s; }
+    .jc-row.dim { opacity:0.38; } .jc-row.place { opacity:0.55; background:#fbfcfe; }
+    .jc-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem; }
+    .jc-name { font-weight:800; font-size:0.82rem; }
+    .jc-eff { font-size:0.68rem; font-weight:800; padding:0.16rem 0.6rem; border-radius:99px; background:#eef1f7; color:var(--ink-soft); white-space:nowrap; }
+    .jc-eff.strong { background:linear-gradient(90deg,var(--coral),var(--amber)); color:#fff; }
+    .jc-bar-label { font-size:0.7rem; color:var(--ink-soft); margin-bottom:0.2rem; } .jc-bar-label b { color:var(--ink); }
+    .jc-bar-bg { height:10px; background:#eef1f7; border-radius:99px; overflow:hidden; }
+    .jc-bar-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--mint),var(--sky)); width:0%; transition:width 0.8s cubic-bezier(.22,.68,0,1.2); }
+    #brain-section { display:none; margin-top:1rem; }
+    .brain-title { font-weight:800; font-size:0.9rem; text-align:center; color:var(--ink); margin-bottom:0.4rem; }
+    #brain-canvas { width:100%; display:block; background:#fbfcfe; border:1px solid var(--line); border-radius:14px; }
+    .brain-cap { font-size:0.7rem; color:var(--ink-soft); text-align:center; margin-top:0.35rem; line-height:1.55; }
+    .analysis-hint { font-size:0.8rem; color:var(--ink-soft); text-align:center; padding:2rem 1rem; }
   </style>
 </head>
 <body>
-  <span class="lang-toggle">
-    <button class="lang-btn" data-lang="kid" onclick="setLang('kid')">🧒 こども</button>
-    <button class="lang-btn" data-lang="adult" onclick="setLang('adult')">🧑 おとな</button>
-  </span>
-
-  <div class="header">
-    <svg class="fish-mark" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="28" cy="34" rx="20" ry="14" fill="#5ec5ff"/>
-      <ellipse cx="28" cy="34" rx="20" ry="14" fill="url(#g)" opacity="0.5"/>
-      <path d="M48 34 L62 24 L60 34 L62 44 Z" fill="#ffc93c"/>
-      <circle cx="20" cy="30" r="3.4" fill="#fff"/><circle cx="19" cy="31" r="1.7" fill="#38415a"/>
-      <circle cx="36" cy="26" r="2" fill="#fff" opacity="0.8"/><circle cx="42" cy="40" r="1.4" fill="#fff" opacity="0.7"/>
-      <defs><linearGradient id="g" x1="8" y1="20" x2="48" y2="48" gradientUnits="userSpaceOnUse"><stop stop-color="#4fd1b5"/><stop offset="1" stop-color="#b794f6"/></linearGradient></defs>
-    </svg>
-    <h1 id="t-title"></h1>
-    <p class="subtitle" id="t-subtitle"></p>
-    <a href="train.html" class="nav-link" id="nav-link"></a>
+  <!-- ウェルカム(初回だけ) -->
+  <div class="welcome" id="welcome">
+    <div class="welcome-inner">
+      <svg class="fish-mark" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="28" cy="34" rx="20" ry="14" fill="#5ec5ff"/>
+        <ellipse cx="28" cy="34" rx="20" ry="14" fill="url(#g)" opacity="0.5"/>
+        <path d="M48 34 L62 24 L60 34 L62 44 Z" fill="#ffc93c"/>
+        <circle cx="20" cy="30" r="3.4" fill="#fff"/><circle cx="19" cy="31" r="1.7" fill="#38415a"/>
+        <circle cx="36" cy="26" r="2" fill="#fff" opacity="0.8"/><circle cx="42" cy="40" r="1.4" fill="#fff" opacity="0.7"/>
+        <defs><linearGradient id="g" x1="8" y1="20" x2="48" y2="48" gradientUnits="userSpaceOnUse"><stop stop-color="#4fd1b5"/><stop offset="1" stop-color="#b794f6"/></linearGradient></defs>
+      </svg>
+      <h1 id="w-title"></h1>
+      <p class="subtitle" id="w-subtitle"></p>
+      <button class="w-start" id="w-start" onclick="startApp()">▶ はじめる</button>
+    </div>
   </div>
 
-  <div class="dashboard">
-    <!-- 左: 判定 -->
-    <div class="panel panel-judge">
-      <div class="model-badge-wrap">
-        <span id="model-badge" class="model-badge"></span>
-        <button id="switch-model-btn" class="reset-bundle-btn" onclick="switchModel()" style="display:none;"></button>
-        <button id="reset-bundle-btn" class="reset-bundle-btn" onclick="resetToBundle()" style="display:none;"></button>
-      </div>
+  <!-- トップバー -->
+  <div class="topbar">
+    <span class="tb-logo">🐟</span>
+    <span class="tb-title" id="t-tb-title"></span>
+    <span class="tb-spacer"></span>
+    <span class="tb-group">
+      <span class="mode-toggle" id="mode-toggle">
+        <button class="mode-btn active" data-mode="A" onclick="setMode('A')" id="t-modeA"></button>
+        <button class="mode-btn" data-mode="B" id="mode-btn-b" onclick="setMode('B')"></button>
+      </span>
+      <span class="lang-toggle">
+        <button class="lang-btn" data-lang="kid" onclick="setLang('kid')">🧒 こども</button>
+        <button class="lang-btn" data-lang="adult" onclick="setLang('adult')">🧑 おとな</button>
+      </span>
+      <span id="model-badge" class="model-badge"></span>
+      <button id="switch-model-btn" class="reset-bundle-btn" onclick="switchModel()" style="display:none;"></button>
+      <button id="reset-bundle-btn" class="reset-bundle-btn" onclick="resetToBundle()" style="display:none;"></button>
+      <a href="train.html" class="nav-link" id="nav-link"></a>
+    </span>
+  </div>
 
+  <!-- ダッシュボード -->
+  <div class="dashboard">
+    <!-- 左: 判定(メイン) -->
+    <div class="panel panel-judge">
       <div class="upload-area" id="upload-area">
         <input type="file" id="file-input" accept="image/*">
         <div class="upload-icon">🖼️</div>
         <div class="upload-text" id="t-upload"></div>
       </div>
-
-      <div class="mode-head" id="t-mode-head"></div>
-      <div class="mode-toggle" id="mode-toggle">
-        <button class="mode-btn active" data-mode="A" onclick="setMode('A')" id="t-modeA"></button>
-        <button class="mode-btn" data-mode="B" id="mode-btn-b" onclick="setMode('B')"></button>
-      </div>
-
       <div id="preview-wrap">
         <div id="preview-wrap-inner">
           <img id="preview" src="" alt="preview">
@@ -216,29 +197,23 @@
           <button class="toggle-heatmap-btn" id="toggle-heatmap" onclick="toggleHeatmap()"></button>
         </div>
       </div>
-
       <button id="judge-btn" onclick="judge()"></button>
-
       <div id="result">
         <div class="result-badge" id="result-badge"></div>
         <div class="result-verdict" id="result-verdict"></div>
         <div class="meter-wrap">
-          <div class="meter-top">
-            <span class="meter-title" id="t-meter-title"></span>
-            <span class="meter-text" id="meter-text">―</span>
-          </div>
+          <div class="meter-top"><span class="meter-title" id="t-meter-title"></span><span class="meter-text" id="meter-text">―</span></div>
           <div class="bar-bg"><div class="bar-fill" id="bar-fill"></div></div>
           <div class="percent-big" id="percent-big">0%</div>
         </div>
         <button class="reset-btn" onclick="reset()" id="t-reset"></button>
       </div>
-
       <div id="status"></div>
     </div>
 
-    <!-- 右: 埋め込み地図(常時パネル) -->
+    <!-- 右上: 地図 -->
     <div class="panel panel-map" id="panel-map" style="display:none;">
-      <div class="map-title" id="t-map-title"></div>
+      <div class="panel-title" id="t-map-title"></div>
       <div class="map-desc" id="t-map-desc"></div>
       <button class="make-map-btn" id="make-map-btn" onclick="makeMap()"></button>
       <div class="map-legend">
@@ -250,8 +225,9 @@
       <div class="map-note" id="t-map-note"></div>
     </div>
 
-    <!-- 下: 分析(判断カード・脳グラフ) -->
-    <div class="panel panel-analysis" id="panel-analysis" style="display:none;">
+    <!-- 右下: 分析 -->
+    <div class="panel panel-analysis">
+      <div class="analysis-hint" id="analysis-hint"></div>
       <div id="judge-card">
         <div class="jc-title" id="t-jc-title"></div>
         <div id="jc-rows"></div>
@@ -259,9 +235,8 @@
           <div class="jc-head"><span class="jc-name" id="t-place-name"></span><span class="jc-eff" id="t-place-eff"></span></div>
           <div class="jc-bar-label" id="t-place-desc"></div>
         </div>
-        <div class="heatmap-note" id="t-jc-note" style="margin-top:0.6rem;"></div>
+        <div class="heatmap-note" id="t-jc-note" style="margin-top:0.5rem;"></div>
       </div>
-
       <div id="brain-section">
         <div class="brain-title" id="brain-title"></div>
         <canvas id="brain-canvas"></canvas>
@@ -276,13 +251,12 @@
   <script>
     let classifier = null, featClassifier = null, mobileNetModel = null, gyopiAvg = null;
     let heatmapVisible = true, currentMode = 'A', resultShown = false, brainRAF = null;
-    let usingOwnModel = false; // true=自分の学習 / false=お手本(同梱)
-    let modelSet = { own: null, bundle: null }; // 各 {classifier, featClassifier, gyopiAvg}
+    let usingOwnModel = false;
+    let modelSet = { own: null, bundle: null };
     let currentSource = 'bundle';
     let curLang = localStorage.getItem('judge-lang') || 'kid';
-    let last = null; // 最後の判定結果(言語切替の再描画用)
+    let last = null;
 
-    // ── 文言(こども/おとな 2セット) ──
     const AXES = [
       { key:'warmth',      icon:'🔥', kid:'いろの あたたかさ', adult:'色の暖かさ' },
       { key:'brightness',  icon:'☀️', kid:'あかるさ',          adult:'明るさ' },
@@ -294,31 +268,29 @@
 
     const LANG = {
       kid: {
-        title:'ぎょぴちゃん はんていマシン',
-        subtitle:'この えは ぎょぴちゃん かな？ コンピュータに きいてみよう！',
-        nav:'🎓 じぶんで AIに おしえる',
-        mapLink:'🗺️ AIの あたまの地図',
-        ownModel:'🧑 きみが おしえた AI', bundleModel:'📦 さいしょから の AI',
-        switchToBundle:'📦 お手本に きりかえ', switchToOwn:'🧑 じぶんのに きりかえ', resetBundle:'🗑️ 学習を けす',
+        title:'ぎょぴちゃん はんていマシン', subtitle:'この えは ぎょぴちゃん かな？ コンピュータに きいてみよう！',
+        nav:'🎓 おしえる',
+        ownModel:'🧑 きみの AI', bundleModel:'📦 お手本 AI',
+        switchToBundle:'📦 お手本へ', switchToOwn:'🧑 じぶんへ', resetBundle:'🗑️ けす',
         upload:'えを ここに ドロップ してね<br>クリックして えらんでも いいよ',
-        modeHead:'🤖 2人の AIが いるよ。どっちに きく？',
         modeA:'🧠 まるごと見るAI', modeB:'🎨 いろ・かたちAI',
         judge:'これ だれ？', judging:'みてるよ…',
         legend:'🔴 コンピュータが よく見た ところ　/　① いちばんの てがかり',
-        note:'※ ほんとは いろも かたちも ぜんぶ 見てるよ。でも コンピュータの あたまの中は のぞけないんだ。だから「どこ」を 見たかだけ おしえてくれるよ。',
+        note:'※ ほんとは いろも かたちも ぜんぶ 見てるよ。でも あたまの中は のぞけないんだ。だから「どこ」を 見たかだけ おしえてくれるよ。',
         hideMap:'🗺️ ちずを かくす', showMap:'🗺️ ちずを みせる',
         meterTitle:'コンピュータの じしん', reset:'↩ もう いちまい',
         jcTitle:'どの とくちょうで きめた？ 🎨',
         placeName:'📍 ばしょ', placeEff:'見てない',
-        placeDesc:'モードB は「ばしょ」を 見てないよ。「👀 どこ見た？」モードで 見れるよ',
+        placeDesc:'モードB は「ばしょ」を 見てないよ。「🧠まるごと見るAI」で 見れるよ',
         jcNote:'※「ぎょぴっぽさ」= ぎょぴちゃんに どれだけ にてるか。「きいた」= その とくちょうが はんていに どれだけ きいたか。',
         matchLabel:'ぎょぴっぽさ', effPrefix:'きいた ',
-        brainTitleA:'コンピュータの あたまの中（のぞけない）👀',
-        brainCapA:'人間の あたまみたいに、ちいさな のうさいぼう（ニューロン）が いっぱい あつまってるよ。多すぎて 中は 見えないんだ。だから「どこを 見たか」だけ わかるよ。',
-        brainTitleB:'コンピュータの あたまの中（ほんもの）🎨',
+        brainTitleA:'あたまの中（のぞけない）👀',
+        brainCapA:'人間の あたまみたいに、ちいさな のうさいぼう（ニューロン）が いっぱい あつまってるよ。多すぎて 中は 見えないんだ。',
+        brainTitleB:'あたまの中（ほんもの）🎨',
         brainCapB:'ひかる線 = いま はたらいてる ところ。ふとい線 = つよい つながり。',
+        analysisHint:'えを はんていすると、ここに「AIの あたまの中」が 出るよ 🧠',
         stLoading:'じゅんびちゅう',
-        stNotrained:'さきに <a href="train.html">べんきょうページ</a> で コンピュータに おぼえさせてね',
+        stNotrained:'さきに <a href="train.html">べんきょうページ</a> で おぼえさせてね',
         stReady:'じゅんび できたよ！ えを いれてね 🐟',
         stThinking:'コンピュータが かんがえてる… 🤔',
         stDoneA:'できたよ！ どこを 見たか みてみてね 👀',
@@ -328,20 +300,17 @@
         verdict:{ yes:'ぎょぴちゃんだ！', maybe:'どっちかな？', no:'ちがうみたい' },
         conf:['ぎょぴちゃんじゃない','ちがう…かな？','うーん、まよう…','ぎょぴちゃん…かな？','たぶん ぎょぴちゃん','ぜったい ぎょぴちゃん！'],
         mapTitle:'🗺️ AIの あたまの地図',
-        mapDesc:'🧠 まるごと見るAIが「にてる」と 思った えが、ちかくに あつまるよ。にてる ほど 線で つながる。',
+        mapDesc:'🧠 まるごと見るAIが「にてる」と 思った えが、ちかくに あつまるよ。',
         mapMake:'🗺️ ちずを つくる', mapYes:'ぎょぴちゃん', mapNo:'ちがう',
         mapNote:'🔴ぎょぴ と 🔵ちがう が べつの かたまりに 分かれたら、AIが ちがいを おぼえた しるし。ノードに さわると どの えか わかるよ。',
         mapStLoad:'えを よみこみ中…', mapStEmb:'AIが えを おぼえてる…', mapStLink:'にてる えを つないでる…', mapStDone:'できた！ ドラッグで うごかせるよ',
       },
       adult: {
-        title:'ぎょぴちゃん判定器',
-        subtitle:'この画像がぎょぴちゃんかどうか、AIに判定させます',
-        nav:'🎓 学習ページ（自分でAIに教える）',
-        mapLink:'🗺️ 埋め込み地図（ネットワーク）',
-        ownModel:'🧑 自分で学習したモデル', bundleModel:'📦 同梱モデル（お手本）',
-        switchToBundle:'📦 お手本に切替', switchToOwn:'🧑 自分のに切替', resetBundle:'🗑️ 学習を削除',
+        title:'ぎょぴちゃん判定器', subtitle:'この画像がぎょぴちゃんかどうか、AIに判定させます',
+        nav:'🎓 学習',
+        ownModel:'🧑 自分のモデル', bundleModel:'📦 お手本モデル',
+        switchToBundle:'📦 お手本へ', switchToOwn:'🧑 自分へ', resetBundle:'🗑️ 削除',
         upload:'画像をドラッグ＆ドロップ<br>またはクリックして選択',
-        modeHead:'🤖 別々のAIモデル。どちらで判定?',
         modeA:'🧠 全体認識AI', modeB:'🎨 色・形 特徴AI',
         judge:'判定する', judging:'判定中…',
         legend:'🔴 AIが注目した領域　/　① 最も影響した場所',
@@ -350,13 +319,14 @@
         meterTitle:'AIの確信度', reset:'↩ 別の画像',
         jcTitle:'どの特徴で判定した? 🎨',
         placeName:'📍 場所（位置）', placeEff:'未使用',
-        placeDesc:'モードBは位置情報を使いません。「👀 どこを見た?」モードで確認できます',
+        placeDesc:'モードBは位置情報を使いません。「🧠全体認識AI」で確認できます',
         jcNote:'※「ぎょぴっぽさ」=ぎょぴちゃん平均との近さ（一致度）。「きいた」=その特徴が判定に与えた影響（寄与度・近似）。',
         matchLabel:'ぎょぴっぽさ', effPrefix:'効き ',
         brainTitleA:'AIの頭の中（のぞけない）👀',
-        brainCapA:'人間の脳と同じように、無数のニューロン（神経細胞）が組み合わさっています。多すぎて内部は解釈できません。だから「どこを見たか」だけが分かります。',
+        brainCapA:'人間の脳と同じように、無数のニューロン（神経細胞）が組み合わさっています。多すぎて内部は解釈できません。',
         brainTitleB:'AIの頭の中（解釈可能）🎨',
         brainCapB:'光る線=活性中の経路。太い線=強い結合（重み大）。',
+        analysisHint:'画像を判定すると、ここに「AIの頭の中」が表示されます 🧠',
         stLoading:'準備中',
         stNotrained:'先に <a href="train.html">学習ページ</a> でモデルを学習させてください',
         stReady:'準備完了。画像を入れてください 🐟',
@@ -368,7 +338,7 @@
         verdict:{ yes:'ぎょぴちゃんです！', maybe:'どちらとも言えません', no:'ちがいます' },
         conf:['ぎょぴちゃんではない','たぶん違う','判定に迷っています','ぎょぴちゃんかも','たぶんぎょぴちゃん','ほぼ確実にぎょぴちゃん'],
         mapTitle:'🗺️ 埋め込み地図',
-        mapDesc:'🧠 全体認識AI(MobileNet)が似ていると判断した画像が近くに集まります。類似度が高いほど線で繋がります。',
+        mapDesc:'🧠 全体認識AI(MobileNet)が似ていると判断した画像が近くに集まります。',
         mapMake:'🗺️ 地図を生成', mapYes:'ぎょぴちゃん', mapNo:'ちがう',
         mapNote:'🔴ぎょぴと🔵ちがうがクラスタに分離していれば、AIが違いを学習できた証拠です。ノードにカーソルを合わせると画像名が出ます。',
         mapStLoad:'画像読み込み中…', mapStEmb:'埋め込み計算中…', mapStLink:'類似度で接続中…', mapStDone:'完了。ドラッグで操作できます',
@@ -376,11 +346,13 @@
     };
     function L(key) { return LANG[curLang][key]; }
 
-    // 静的文言を一括適用
+    function startApp() { localStorage.setItem('judge-welcomed', '1'); document.getElementById('welcome').classList.add('hide'); }
+
     function applyLang() {
       const x = LANG[curLang];
-      document.getElementById('t-title').textContent = x.title;
-      document.getElementById('t-subtitle').textContent = x.subtitle;
+      document.getElementById('w-title').textContent = x.title;
+      document.getElementById('w-subtitle').textContent = x.subtitle;
+      document.getElementById('t-tb-title').textContent = x.title;
       document.getElementById('nav-link').textContent = x.nav;
       document.getElementById('t-map-title').textContent = x.mapTitle;
       document.getElementById('t-map-desc').textContent = x.mapDesc;
@@ -389,7 +361,6 @@
       document.getElementById('t-map-no').textContent = x.mapNo;
       document.getElementById('t-map-note').textContent = x.mapNote;
       document.getElementById('t-upload').innerHTML = x.upload;
-      document.getElementById('t-mode-head').textContent = x.modeHead;
       document.getElementById('t-modeA').textContent = x.modeA;
       document.getElementById('mode-btn-b').textContent = x.modeB;
       document.getElementById('judge-btn').textContent = x.judge;
@@ -403,10 +374,10 @@
       document.getElementById('t-place-eff').textContent = x.placeEff;
       document.getElementById('t-place-desc').textContent = x.placeDesc;
       document.getElementById('t-jc-note').textContent = x.jcNote;
+      document.getElementById('analysis-hint').textContent = x.analysisHint;
       document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === curLang));
       updateModelBadge();
       buildJudgeCardRows();
-      // 結果が出ていれば 最後の値で再描画(再計算なし)
       if (resultShown && last) {
         showResult(last.prob);
         if (currentMode === 'A') { document.getElementById('brain-title').textContent = x.brainTitleA; document.getElementById('brain-cap').textContent = x.brainCapA; }
@@ -415,43 +386,31 @@
     }
     function setLang(lang) { curLang = lang; localStorage.setItem('judge-lang', lang); applyLang(); }
 
-    // お手本(model/) と 自分の学習(IndexedDB) を 1セットずつ読み込む
     async function loadSet(where) {
       const idb = where === 'idb';
       try {
-        const cls = idb ? await tf.loadLayersModel('indexeddb://gyopi-classifier')
-                        : await tf.loadLayersModel('model/gyopi-classifier/model.json');
+        const cls = idb ? await tf.loadLayersModel('indexeddb://gyopi-classifier') : await tf.loadLayersModel('model/gyopi-classifier/model.json');
         let feat = null, avg = null;
         try {
-          feat = idb ? await tf.loadLayersModel('indexeddb://gyopi-feature-classifier')
-                     : await tf.loadLayersModel('model/gyopi-feature-classifier/model.json');
-          avg = idb ? JSON.parse(localStorage.getItem('gyopi-avg-features') || 'null')
-                    : await fetch('model/gyopi-avg.json').then(r => r.ok ? r.json() : null).catch(() => null);
+          feat = idb ? await tf.loadLayersModel('indexeddb://gyopi-feature-classifier') : await tf.loadLayersModel('model/gyopi-feature-classifier/model.json');
+          avg = idb ? JSON.parse(localStorage.getItem('gyopi-avg-features') || 'null') : await fetch('model/gyopi-avg.json').then(r => r.ok ? r.json() : null).catch(() => null);
         } catch (_) { feat = null; }
         return { classifier: cls, featClassifier: feat, gyopiAvg: avg };
       } catch (_) { return null; }
     }
-
-    // 現在のソース(own/bundle)を実際に使うモデルに反映
     function applyModel() {
       const s = modelSet[currentSource];
-      classifier = s.classifier;
-      featClassifier = s.featClassifier;
-      gyopiAvg = s.gyopiAvg;
+      classifier = s.classifier; featClassifier = s.featClassifier; gyopiAvg = s.gyopiAvg;
       usingOwnModel = (currentSource === 'own');
       document.getElementById('mode-btn-b').disabled = !(featClassifier && gyopiAvg);
       updateModelBadge();
     }
-
-    // 自分のAI ⇔ お手本AI を切り替え(消さずに行き来)
     function switchModel() {
       if (!(modelSet.own && modelSet.bundle)) return;
       currentSource = currentSource === 'own' ? 'bundle' : 'own';
       applyModel();
       if (resultShown) judge();
     }
-
-    // バッジ・切替ボタンの表示
     function updateModelBadge() {
       const x = LANG[curLang], hasBoth = !!(modelSet.own && modelSet.bundle);
       const b = document.getElementById('model-badge');
@@ -461,8 +420,6 @@
       const r = document.getElementById('reset-bundle-btn');
       if (r) { r.textContent = x.resetBundle; r.style.display = (usingOwnModel && hasBoth) ? 'inline-block' : 'none'; }
     }
-
-    // 自分の学習を完全に消して お手本だけに戻す
     async function resetToBundle() {
       try { await tf.io.removeModel('indexeddb://gyopi-classifier'); } catch (_) {}
       try { await tf.io.removeModel('indexeddb://gyopi-feature-classifier'); } catch (_) {}
@@ -470,12 +427,10 @@
       location.reload();
     }
 
-    // ── 埋め込み地図(ローカルのみ: training_data が要る) ──
     function setMapStatus(m) { document.getElementById('map-status').textContent = m; }
     function loadImageURL(url) { return new Promise((res, rej) => { const i = new Image(); i.crossOrigin = 'anonymous'; i.onload = () => res(i); i.onerror = rej; i.src = url; }); }
     function makeThumb(img) { const S = 56, c = document.createElement('canvas'); c.width = c.height = S; const x = c.getContext('2d'), m = Math.min(img.width, img.height); x.drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, S, S); return c.toDataURL('image/jpeg', 0.72); }
     function cosine(a, b) { let d = 0, na = 0, nb = 0; for (let i = 0; i < a.length; i++) { d += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i]; } return d / (Math.sqrt(na) * Math.sqrt(nb) + 1e-9); }
-
     async function makeMap() {
       const btn = document.getElementById('make-map-btn'); btn.disabled = true;
       try {
@@ -514,7 +469,6 @@
       } catch (e) { setMapStatus('⚠️ ' + e.message); btn.disabled = false; }
     }
 
-    // 学習ページ・地図は training_data 必須(ローカルのみ)。train.html が在る時だけ出す
     async function setupNavLink() {
       try {
         const r = await fetch('train.html', { method: 'HEAD' }); if (!r.ok) throw 0;
@@ -528,16 +482,13 @@
       setStatus(L('stLoading'));
       try {
         mobileNetModel = await mobilenet.load({ version: 1, alpha: 0.25 });
-        modelSet.bundle = await loadSet('model'); // お手本(同梱)
-        modelSet.own = await loadSet('idb');       // 自分の学習(無ければ null)
+        modelSet.bundle = await loadSet('model');
+        modelSet.own = await loadSet('idb');
         if (!modelSet.bundle && !modelSet.own) throw new Error('no model');
-        // 自分の学習が在れば それを使う / 無ければ お手本
         currentSource = modelSet.own ? 'own' : (modelSet.bundle ? 'bundle' : 'own');
         applyModel();
         setStatus(L('stReady'));
-      } catch (e) {
-        setStatus(L('stNotrained'));
-      }
+      } catch (e) { setStatus(L('stNotrained')); }
     }
 
     function buildJudgeCardRows() {
@@ -570,10 +521,7 @@
         document.getElementById('upload-area').style.display = 'none';
         document.getElementById('preview-wrap').style.display = 'block';
         document.getElementById('judge-btn').style.display = 'block';
-        document.getElementById('mode-toggle').classList.add('show');
-        document.getElementById('t-mode-head').classList.add('show');
         document.getElementById('result').style.display = 'none';
-        document.getElementById('panel-analysis').style.display = 'none';
         document.getElementById('heatmap-canvas').style.display = 'none';
         document.getElementById('heatmap-info').style.display = 'none';
         resultShown = false;
@@ -584,10 +532,10 @@
     async function judge() {
       if (!classifier) { setStatus(L('stNoModel')); return; }
       if (currentMode === 'B' && (!featClassifier || !gyopiAvg)) setMode('A');
+      document.getElementById('analysis-hint').style.display = 'none';
       const img = document.getElementById('preview');
       if (currentMode === 'A') await judgeMobileNet(img);
       else await judgeFeature(img);
-      document.getElementById('panel-analysis').style.display = 'block';
     }
 
     async function judgeMobileNet(img) {
@@ -654,10 +602,8 @@
 
     function analyzeImageFeatures(imgEl) {
       const S = 80;
-      const canvas = document.createElement('canvas');
-      canvas.width = S; canvas.height = S;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(imgEl, 0, 0, S, S);
+      const canvas = document.createElement('canvas'); canvas.width = S; canvas.height = S;
+      const ctx = canvas.getContext('2d'); ctx.drawImage(imgEl, 0, 0, S, S);
       const { data } = ctx.getImageData(0, 0, S, S);
       let warmSum = 0, brightSum = 0, satSum = 0;
       const hueHist = new Float32Array(12), gray = new Float32Array(S * S), n = S * S;
@@ -741,7 +687,6 @@
       document.getElementById('toggle-heatmap').textContent = heatmapVisible ? L('hideMap') : L('showMap');
     }
 
-    // ── 脳みそグラフ ──
     let _brainDraw = null;
     function animateBrain(drawFn) {
       cancelAnimationFrame(brainRAF); _brainDraw = drawFn;
@@ -751,17 +696,11 @@
     function brainCtx() {
       const section = document.getElementById('brain-section'); section.style.display = 'block';
       const canvas = document.getElementById('brain-canvas');
-      const W = canvas.width = canvas.offsetWidth || 416, H = canvas.height = 230;
+      const W = canvas.width = canvas.offsetWidth || 380, H = canvas.height = 210;
       return { ctx: canvas.getContext('2d'), W, H };
     }
-    function drawNode(ctx, p, r, fill, ring) {
-      ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI*2); ctx.fillStyle = fill; ctx.fill();
-      if (ring) { ctx.lineWidth = 2.5; ctx.strokeStyle = '#ff7a8a'; ctx.stroke(); }
-    }
-    function drawPulse(ctx, a, b, phase) {
-      const x = a.x + (b.x - a.x) * phase, y = a.y + (b.y - a.y) * phase;
-      ctx.beginPath(); ctx.arc(x, y, 2.4, 0, Math.PI*2); ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.fill();
-    }
+    function drawNode(ctx, p, r, fill, ring) { ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI*2); ctx.fillStyle = fill; ctx.fill(); if (ring) { ctx.lineWidth = 2.5; ctx.strokeStyle = '#ff7a8a'; ctx.stroke(); } }
+    function drawPulse(ctx, a, b, phase) { const x = a.x + (b.x - a.x) * phase, y = a.y + (b.y - a.y) * phase; ctx.beginPath(); ctx.arc(x, y, 2.4, 0, Math.PI*2); ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.fill(); }
     function renderBrainFeature(vec, prob, effPct) {
       document.getElementById('brain-title').textContent = L('brainTitleB');
       document.getElementById('brain-cap').textContent = L('brainCapB');
@@ -773,7 +712,7 @@
       const strongAxis = effPct.indexOf(Math.max(...effPct)), ICON = AXES.map(a => a.icon);
       animateBrain((t) => {
         const { ctx, W, H } = brainCtx(); ctx.clearRect(0, 0, W, H);
-        const pad = 26, xIn = W*0.12, xMid = W*0.5, xOut = W*0.88, yAt = (i,n) => pad + i*(H-2*pad)/Math.max(1,n-1), inN = vec.length;
+        const pad = 24, xIn = W*0.12, xMid = W*0.5, xOut = W*0.88, yAt = (i,n) => pad + i*(H-2*pad)/Math.max(1,n-1), inN = vec.length;
         const inPos = vec.map((_, i) => ({ x:xIn, y:yAt(i,inN) })), midPos = hidden.map((_, j) => ({ x:xMid, y:yAt(j,H1) })), outPos = { x:xOut, y:H/2 };
         const pulse = (t % 1.6) / 1.6;
         for (let i = 0; i < inN; i++) for (let j = 0; j < H1; j++) {
@@ -788,9 +727,9 @@
         }
         if (strongAxis >= 0) for (let j = 0; j < H1; j++) { drawPulse(ctx, inPos[strongAxis], midPos[j], pulse); drawPulse(ctx, midPos[j], outPos, pulse); }
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        inPos.forEach((p, i) => { drawNode(ctx, p, 13, `rgba(79,209,181,${0.3+Math.min(1,vec[i])*0.7})`, i===strongAxis); ctx.font='13px sans-serif'; ctx.fillText(ICON[i], p.x, p.y); });
-        midPos.forEach((p, j) => drawNode(ctx, p, 8, `rgba(183,148,246,${0.2+(hidden[j]/maxH)*0.8})`, false));
-        drawNode(ctx, outPos, 18, `rgba(255,122,138,${0.3+prob*0.7})`, true); ctx.font='18px sans-serif'; ctx.fillText('🐟', outPos.x, outPos.y);
+        inPos.forEach((p, i) => { drawNode(ctx, p, 12, `rgba(79,209,181,${0.3+Math.min(1,vec[i])*0.7})`, i===strongAxis); ctx.font='12px sans-serif'; ctx.fillText(ICON[i], p.x, p.y); });
+        midPos.forEach((p, j) => drawNode(ctx, p, 7, `rgba(183,148,246,${0.2+(hidden[j]/maxH)*0.8})`, false));
+        drawNode(ctx, outPos, 17, `rgba(255,122,138,${0.3+prob*0.7})`, true); ctx.font='17px sans-serif'; ctx.fillText('🐟', outPos.x, outPos.y);
       });
     }
     function renderBrainBlackbox(prob) {
@@ -801,36 +740,29 @@
       animateBrain((t) => {
         const { ctx, W, H } = brainCtx(); ctx.clearRect(0, 0, W, H);
         const inP = { x:W*0.1, y:H/2 }, outP = { x:W*0.9, y:H/2 };
-        cloud.forEach(c => {
-          const a = 0.16 + 0.12*Math.sin(t*1.6 + c.ph);
-          ctx.beginPath(); ctx.arc(c.rx*W, c.ry*H, c.r, 0, Math.PI*2);
-          ctx.fillStyle = `rgba(138,147,171,${a})`; ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(138,147,171,0.4)'; ctx.fill();
-        });
+        cloud.forEach(c => { const a = 0.16 + 0.12*Math.sin(t*1.6 + c.ph); ctx.beginPath(); ctx.arc(c.rx*W, c.ry*H, c.r, 0, Math.PI*2); ctx.fillStyle = `rgba(138,147,171,${a})`; ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(138,147,171,0.4)'; ctx.fill(); });
         ctx.shadowBlur = 0; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        drawNode(ctx, inP, 16, 'rgba(94,197,255,0.85)', false); ctx.font='15px sans-serif'; ctx.fillText('🖼️', inP.x, inP.y);
-        drawNode(ctx, outP, 18, `rgba(255,122,138,${0.3+prob*0.7})`, true); ctx.font='18px sans-serif'; ctx.fillText('🐟', outP.x, outP.y);
-        ctx.fillStyle = 'rgba(138,147,171,0.5)'; ctx.font = 'bold 26px sans-serif'; ctx.fillText('?', W*0.5, H*0.5);
+        drawNode(ctx, inP, 15, 'rgba(94,197,255,0.85)', false); ctx.font='14px sans-serif'; ctx.fillText('🖼️', inP.x, inP.y);
+        drawNode(ctx, outP, 17, `rgba(255,122,138,${0.3+prob*0.7})`, true); ctx.font='17px sans-serif'; ctx.fillText('🐟', outP.x, outP.y);
+        ctx.fillStyle = 'rgba(138,147,171,0.5)'; ctx.font = 'bold 24px sans-serif'; ctx.fillText('?', W*0.5, H*0.5);
       });
     }
 
     function reset() {
       cancelAnimationFrame(brainRAF); _brainDraw = null; resultShown = false; last = null;
-      ['preview-wrap','result','heatmap-info','judge-card','brain-section','panel-analysis'].forEach(id => { document.getElementById(id).style.display = 'none'; });
+      ['preview-wrap','result','heatmap-info','judge-card','brain-section'].forEach(id => { document.getElementById(id).style.display = 'none'; });
       document.getElementById('heatmap-canvas').style.display = 'none';
       document.getElementById('judge-btn').style.display = 'none';
-      document.getElementById('mode-toggle').classList.remove('show');
-      document.getElementById('t-mode-head').classList.remove('show');
       document.getElementById('upload-area').style.display = 'block';
+      document.getElementById('analysis-hint').style.display = 'block';
       document.getElementById('file-input').value = '';
       setStatus(L('stReady'));
     }
 
-    function setStatus(msg) {
-      const el = document.getElementById('status');
-      el.innerHTML = msg === L('stLoading') ? msg + '<span class="loading-dots"></span>' : msg;
-    }
+    function setStatus(msg) { const el = document.getElementById('status'); el.innerHTML = msg === L('stLoading') ? msg + '<span class="loading-dots"></span>' : msg; }
 
     applyLang();
+    if (localStorage.getItem('judge-welcomed')) document.getElementById('welcome').classList.add('hide');
     setupNavLink();
     setupUpload();
     loadModel();
