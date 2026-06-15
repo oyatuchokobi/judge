@@ -32,10 +32,14 @@
     @keyframes titleBounce { 0%{transform:scale(0.8);opacity:0} 70%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
     .subtitle { color:var(--ink-soft); font-size:0.9rem; margin-top:0.35rem; letter-spacing:0.02em; }
 
-    /* 言語トグル(こども/おとな) */
-    .lang-toggle { display:inline-flex; margin-top:0.9rem; background:#eef1f7; border-radius:99px; padding:3px; gap:3px; }
-    .lang-btn { border:none; background:transparent; padding:0.35rem 0.9rem; border-radius:99px; font-weight:800; font-size:0.8rem; color:var(--ink-soft); cursor:pointer; font-family:inherit; transition:all 0.2s; }
-    .lang-btn.active { background:#fff; color:var(--ink); box-shadow:0 2px 8px rgba(56,65,90,0.12); }
+    /* 言語トグル(こども/おとな) — 右上に固定 */
+    .lang-toggle { position:fixed; top:14px; right:14px; z-index:50; display:inline-flex; background:#fff; border:1px solid var(--line); border-radius:99px; padding:3px; gap:3px; box-shadow:0 3px 14px rgba(56,65,90,0.14); }
+    .lang-btn { border:none; background:transparent; padding:0.35rem 0.85rem; border-radius:99px; font-weight:800; font-size:0.8rem; color:var(--ink-soft); cursor:pointer; font-family:inherit; transition:all 0.2s; }
+    .lang-btn.active { background:#eef1f7; color:var(--ink); }
+
+    /* モード(=どちらのAI)見出し */
+    .mode-head { display:none; text-align:center; font-size:0.82rem; font-weight:800; color:var(--ink-soft); margin-top:1.3rem; margin-bottom:-0.2rem; }
+    .mode-head.show { display:block; }
 
     .nav-link {
       display:inline-block; margin-top:0.7rem; margin-left:0.5rem; color:var(--ink);
@@ -60,7 +64,7 @@
     @keyframes floatBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
     .upload-text { color:var(--ink-soft); font-size:0.92rem; line-height:1.7; }
 
-    .mode-toggle { display:none; margin-top:1.3rem; background:#eef1f7; border-radius:99px; padding:4px; gap:4px; position:relative; z-index:1; }
+    .mode-toggle { display:none; margin-top:0.5rem; background:#eef1f7; border-radius:99px; padding:4px; gap:4px; position:relative; z-index:1; }
     .mode-toggle.show { display:flex; }
     .mode-btn { flex:1; border:none; background:transparent; padding:0.6rem 0.4rem; border-radius:99px; font-weight:800; font-size:0.9rem; color:var(--ink-soft); cursor:pointer; font-family:inherit; transition:all 0.2s; }
     .mode-btn.active { background:#fff; color:var(--ink); box-shadow:0 2px 8px rgba(56,65,90,0.12); }
@@ -136,6 +140,11 @@
   </style>
 </head>
 <body>
+  <span class="lang-toggle">
+    <button class="lang-btn" data-lang="kid" onclick="setLang('kid')">🧒 こども</button>
+    <button class="lang-btn" data-lang="adult" onclick="setLang('adult')">🧑 おとな</button>
+  </span>
+
   <div class="header">
     <svg class="fish-mark" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
       <ellipse cx="28" cy="34" rx="20" ry="14" fill="#5ec5ff"/>
@@ -147,13 +156,7 @@
     </svg>
     <h1 id="t-title"></h1>
     <p class="subtitle" id="t-subtitle"></p>
-    <div>
-      <span class="lang-toggle">
-        <button class="lang-btn" data-lang="kid" onclick="setLang('kid')">🧒 こども</button>
-        <button class="lang-btn" data-lang="adult" onclick="setLang('adult')">🧑 おとな</button>
-      </span>
-      <a href="train.html" class="nav-link" id="nav-link"></a>
-    </div>
+    <a href="train.html" class="nav-link" id="nav-link"></a>
   </div>
 
   <div class="card">
@@ -166,6 +169,7 @@
       <div class="upload-text" id="t-upload"></div>
     </div>
 
+    <div class="mode-head" id="t-mode-head"></div>
     <div class="mode-toggle" id="mode-toggle">
       <button class="mode-btn active" data-mode="A" onclick="setMode('A')" id="t-modeA"></button>
       <button class="mode-btn" data-mode="B" id="mode-btn-b" onclick="setMode('B')"></button>
@@ -244,7 +248,8 @@
         subtitle:'この えは ぎょぴちゃん かな？ コンピュータに きいてみよう！',
         nav:'🎓 べんきょうページ',
         upload:'えを ここに ドロップ してね<br>クリックして えらんでも いいよ',
-        modeA:'👀 どこ見た？', modeB:'🎨 なぜ？',
+        modeHead:'🤖 2人の AIが いるよ。どっちに きく？',
+        modeA:'👀 ぱっと見AI', modeB:'🎨 じっくりAI',
         judge:'これ だれ？', judging:'みてるよ…',
         legend:'🔴 コンピュータが よく見た ところ　/　① いちばんの てがかり',
         note:'※ ほんとは いろも かたちも ぜんぶ 見てるよ。でも コンピュータの あたまの中は のぞけないんだ。だから「どこ」を 見たかだけ おしえてくれるよ。',
@@ -275,7 +280,8 @@
         subtitle:'この画像がぎょぴちゃんかどうか、AIに判定させます',
         nav:'🎓 学習ページ',
         upload:'画像をドラッグ＆ドロップ<br>またはクリックして選択',
-        modeA:'👀 どこを見た?', modeB:'🎨 なぜ?',
+        modeHead:'🤖 別々のAIモデル。どちらで判定?',
+        modeA:'👀 直感AI', modeB:'🎨 特徴AI',
         judge:'判定する', judging:'判定中…',
         legend:'🔴 AIが注目した領域　/　① 最も影響した場所',
         note:'※ 実際は色も形もすべて使っています。ただしモデル内部は解釈できないため、可視化できるのは「どこ」を見たか（位置）のみです。',
@@ -311,6 +317,7 @@
       document.getElementById('t-subtitle').textContent = x.subtitle;
       document.getElementById('nav-link').textContent = x.nav;
       document.getElementById('t-upload').innerHTML = x.upload;
+      document.getElementById('t-mode-head').textContent = x.modeHead;
       document.getElementById('t-modeA').textContent = x.modeA;
       document.getElementById('mode-btn-b').textContent = x.modeB;
       document.getElementById('judge-btn').textContent = x.judge;
@@ -395,6 +402,7 @@
         document.getElementById('preview-wrap').style.display = 'block';
         document.getElementById('judge-btn').style.display = 'block';
         document.getElementById('mode-toggle').classList.add('show');
+        document.getElementById('t-mode-head').classList.add('show');
         document.getElementById('result').style.display = 'none';
         document.getElementById('heatmap-canvas').style.display = 'none';
         document.getElementById('heatmap-info').style.display = 'none';
@@ -640,6 +648,7 @@
       document.getElementById('heatmap-canvas').style.display = 'none';
       document.getElementById('judge-btn').style.display = 'none';
       document.getElementById('mode-toggle').classList.remove('show');
+      document.getElementById('t-mode-head').classList.remove('show');
       document.getElementById('file-input').value = '';
       setStatus(L('stReady'));
     }
