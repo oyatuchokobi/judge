@@ -133,7 +133,9 @@
     .jc-bar-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--mint),var(--sky)); width:0%; transition:width 0.8s cubic-bezier(.22,.68,0,1.2); }
     #brain-section { display:none; margin-top:1rem; }
     .brain-title { font-weight:800; font-size:0.9rem; text-align:center; color:var(--ink); margin-bottom:0.4rem; }
+    .brain-canvas-wrap { position:relative; }
     #brain-canvas { width:100%; display:block; background:#fbfcfe; border:1px solid var(--line); border-radius:14px; }
+    .brain-note-overlay { display:none; position:absolute; left:8px; right:8px; bottom:8px; font-size:0.66rem; line-height:1.5; color:var(--ink); background:rgba(255,255,255,0.88); border-radius:10px; padding:0.45rem 0.6rem; text-align:left; box-shadow:0 2px 8px rgba(56,65,90,0.12); }
     .brain-cap { font-size:0.7rem; color:var(--ink-soft); text-align:center; margin-top:0.35rem; line-height:1.55; }
     .analysis-hint { font-size:0.8rem; color:var(--ink-soft); text-align:center; padding:2rem 1rem; }
   </style>
@@ -193,7 +195,6 @@
         </div>
         <div class="heatmap-info" id="heatmap-info" style="display:none;">
           <div class="heatmap-legend" id="t-legend"></div>
-          <div class="heatmap-note" id="t-note"></div>
           <button class="toggle-heatmap-btn" id="toggle-heatmap" onclick="toggleHeatmap()"></button>
         </div>
       </div>
@@ -239,7 +240,10 @@
       </div>
       <div id="brain-section">
         <div class="brain-title" id="brain-title"></div>
-        <canvas id="brain-canvas"></canvas>
+        <div class="brain-canvas-wrap">
+          <canvas id="brain-canvas"></canvas>
+          <div class="brain-note-overlay" id="brain-note-overlay"></div>
+        </div>
         <div class="brain-cap" id="brain-cap"></div>
       </div>
     </div>
@@ -365,7 +369,6 @@
       document.getElementById('mode-btn-b').textContent = x.modeB;
       document.getElementById('judge-btn').textContent = x.judge;
       document.getElementById('t-legend').textContent = x.legend;
-      document.getElementById('t-note').textContent = x.note;
       document.getElementById('toggle-heatmap').textContent = heatmapVisible ? x.hideMap : x.showMap;
       document.getElementById('t-meter-title').textContent = x.meterTitle;
       document.getElementById('t-reset').textContent = x.reset;
@@ -380,7 +383,7 @@
       buildJudgeCardRows();
       if (resultShown && last) {
         showResult(last.prob);
-        if (currentMode === 'A') { document.getElementById('brain-title').textContent = x.brainTitleA; document.getElementById('brain-cap').textContent = x.brainCapA; }
+        if (currentMode === 'A') { document.getElementById('brain-title').textContent = x.brainTitleA; document.getElementById('brain-cap').textContent = x.brainCapA; document.getElementById('brain-note-overlay').textContent = x.note; }
         else { showJudgeCard(last.matchPct, last.effPct); document.getElementById('brain-title').textContent = x.brainTitleB; document.getElementById('brain-cap').textContent = x.brainCapB; }
       }
     }
@@ -702,6 +705,7 @@
     function drawNode(ctx, p, r, fill, ring) { ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI*2); ctx.fillStyle = fill; ctx.fill(); if (ring) { ctx.lineWidth = 2.5; ctx.strokeStyle = '#ff7a8a'; ctx.stroke(); } }
     function drawPulse(ctx, a, b, phase) { const x = a.x + (b.x - a.x) * phase, y = a.y + (b.y - a.y) * phase; ctx.beginPath(); ctx.arc(x, y, 2.4, 0, Math.PI*2); ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.fill(); }
     function renderBrainFeature(vec, prob, effPct) {
+      document.getElementById('brain-note-overlay').style.display = 'none';
       document.getElementById('brain-title').textContent = L('brainTitleB');
       document.getElementById('brain-cap').textContent = L('brainCapB');
       const Wt = featClassifier.getWeights(), W1 = Wt[0].arraySync(), b1 = Wt[1].arraySync(), W2 = Wt[2].arraySync(), H1 = b1.length;
@@ -735,6 +739,7 @@
     function renderBrainBlackbox(prob) {
       document.getElementById('brain-title').textContent = L('brainTitleA');
       document.getElementById('brain-cap').textContent = L('brainCapA');
+      const ov = document.getElementById('brain-note-overlay'); ov.textContent = L('note'); ov.style.display = 'block';
       const cloud = [];
       for (let k = 0; k < 40; k++) cloud.push({ rx:0.30+Math.random()*0.40, ry:0.10+Math.random()*0.80, r:2+Math.random()*4, ph:Math.random()*6.28 });
       animateBrain((t) => {
