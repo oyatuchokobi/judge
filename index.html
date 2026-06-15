@@ -53,6 +53,26 @@
       box-shadow:0 16px 48px rgba(56,65,90,0.10),0 3px 10px rgba(56,65,90,0.04); border:1px solid var(--line); overflow:hidden;
     }
     .card::before { content:''; position:absolute; top:0; left:0; right:0; height:6px; background:linear-gradient(90deg,var(--coral),var(--amber),var(--mint),var(--sky),var(--violet)); }
+    /* ── ダッシュボード(2カラム) ── */
+    .dashboard { display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,0.95fr); gap:1.2rem; width:100%; max-width:1060px; align-items:start; }
+    .panel { position:relative; background:#fff; border-radius:26px; padding:1.6rem; box-shadow:0 12px 40px rgba(56,65,90,0.09); border:1px solid var(--line); overflow:hidden; }
+    .panel::before { content:''; position:absolute; top:0; left:0; right:0; height:5px; background:linear-gradient(90deg,var(--coral),var(--amber),var(--mint),var(--sky),var(--violet)); }
+    .panel-judge { grid-column:1; grid-row:1; }
+    .panel-map { grid-column:2; grid-row:1; }
+    .panel-analysis { grid-column:1 / -1; grid-row:2; }
+    @media (max-width:820px) { .dashboard { grid-template-columns:1fr; } .panel-judge,.panel-map,.panel-analysis { grid-column:1; grid-row:auto; } }
+
+    /* ── 埋め込み地図パネル ── */
+    .map-title { font-weight:800; font-size:1rem; text-align:center; color:var(--ink); }
+    .map-desc { font-size:0.8rem; color:var(--ink-soft); text-align:center; line-height:1.6; margin:0.4rem 0 0.9rem; }
+    .make-map-btn { display:block; width:100%; padding:0.8rem; font-size:1rem; font-weight:800; color:#fff; font-family:inherit; background:linear-gradient(120deg,var(--mint),var(--sky)); border:none; border-radius:99px; cursor:pointer; box-shadow:0 6px 18px rgba(79,209,181,0.32); margin-bottom:0.8rem; transition:all 0.2s; }
+    .make-map-btn:hover { transform:translateY(-2px); } .make-map-btn:disabled { opacity:0.55; cursor:not-allowed; transform:none; }
+    .map-legend { display:flex; gap:1.2rem; justify-content:center; font-size:0.8rem; font-weight:700; margin-bottom:0.6rem; }
+    .map-dot { display:inline-block; width:11px; height:11px; border-radius:50%; margin-right:5px; vertical-align:middle; }
+    #network { width:100%; height:360px; border:1px solid var(--line); border-radius:14px; background:#fbfcfe; }
+    .map-status { font-size:0.8rem; color:var(--ink-soft); text-align:center; margin-top:0.6rem; min-height:1.2em; }
+    .map-note { font-size:0.74rem; color:var(--ink-soft); line-height:1.6; margin-top:0.6rem; background:#fbfcfe; border:1px solid var(--line); border-radius:12px; padding:0.55rem 0.8rem; text-align:left; }
+
     .bubble-deco { position:absolute; border-radius:50%; opacity:0.5; pointer-events:none; }
     .bubble-deco.b1 { width:70px; height:70px; background:#ffe3ec; top:30px; right:-22px; }
     .bubble-deco.b2 { width:44px; height:44px; background:#d8f3ff; bottom:24px; left:-16px; }
@@ -162,58 +182,76 @@
     <h1 id="t-title"></h1>
     <p class="subtitle" id="t-subtitle"></p>
     <a href="train.html" class="nav-link" id="nav-link"></a>
-    <a href="graph.html" class="nav-link" id="map-link" style="display:none;"></a>
   </div>
 
-  <div class="card">
-    <span class="bubble-deco b1"></span>
-    <span class="bubble-deco b2"></span>
-
-    <div class="model-badge-wrap">
-      <span id="model-badge" class="model-badge"></span>
-      <button id="switch-model-btn" class="reset-bundle-btn" onclick="switchModel()" style="display:none;"></button>
-      <button id="reset-bundle-btn" class="reset-bundle-btn" onclick="resetToBundle()" style="display:none;"></button>
-    </div>
-
-    <div class="upload-area" id="upload-area">
-      <input type="file" id="file-input" accept="image/*">
-      <div class="upload-icon">🖼️</div>
-      <div class="upload-text" id="t-upload"></div>
-    </div>
-
-    <div class="mode-head" id="t-mode-head"></div>
-    <div class="mode-toggle" id="mode-toggle">
-      <button class="mode-btn active" data-mode="A" onclick="setMode('A')" id="t-modeA"></button>
-      <button class="mode-btn" data-mode="B" id="mode-btn-b" onclick="setMode('B')"></button>
-    </div>
-
-    <div id="preview-wrap">
-      <div id="preview-wrap-inner">
-        <img id="preview" src="" alt="preview">
-        <canvas id="heatmap-canvas"></canvas>
+  <div class="dashboard">
+    <!-- 左: 判定 -->
+    <div class="panel panel-judge">
+      <div class="model-badge-wrap">
+        <span id="model-badge" class="model-badge"></span>
+        <button id="switch-model-btn" class="reset-bundle-btn" onclick="switchModel()" style="display:none;"></button>
+        <button id="reset-bundle-btn" class="reset-bundle-btn" onclick="resetToBundle()" style="display:none;"></button>
       </div>
-      <div class="heatmap-info" id="heatmap-info" style="display:none;">
-        <div class="heatmap-legend" id="t-legend"></div>
-        <div class="heatmap-note" id="t-note"></div>
-        <button class="toggle-heatmap-btn" id="toggle-heatmap" onclick="toggleHeatmap()"></button>
+
+      <div class="upload-area" id="upload-area">
+        <input type="file" id="file-input" accept="image/*">
+        <div class="upload-icon">🖼️</div>
+        <div class="upload-text" id="t-upload"></div>
       </div>
-    </div>
 
-    <button id="judge-btn" onclick="judge()"></button>
+      <div class="mode-head" id="t-mode-head"></div>
+      <div class="mode-toggle" id="mode-toggle">
+        <button class="mode-btn active" data-mode="A" onclick="setMode('A')" id="t-modeA"></button>
+        <button class="mode-btn" data-mode="B" id="mode-btn-b" onclick="setMode('B')"></button>
+      </div>
 
-    <div id="result">
-      <div class="result-badge" id="result-badge"></div>
-      <div class="result-verdict" id="result-verdict"></div>
-
-      <div class="meter-wrap">
-        <div class="meter-top">
-          <span class="meter-title" id="t-meter-title"></span>
-          <span class="meter-text" id="meter-text">―</span>
+      <div id="preview-wrap">
+        <div id="preview-wrap-inner">
+          <img id="preview" src="" alt="preview">
+          <canvas id="heatmap-canvas"></canvas>
         </div>
-        <div class="bar-bg"><div class="bar-fill" id="bar-fill"></div></div>
-        <div class="percent-big" id="percent-big">0%</div>
+        <div class="heatmap-info" id="heatmap-info" style="display:none;">
+          <div class="heatmap-legend" id="t-legend"></div>
+          <div class="heatmap-note" id="t-note"></div>
+          <button class="toggle-heatmap-btn" id="toggle-heatmap" onclick="toggleHeatmap()"></button>
+        </div>
       </div>
 
+      <button id="judge-btn" onclick="judge()"></button>
+
+      <div id="result">
+        <div class="result-badge" id="result-badge"></div>
+        <div class="result-verdict" id="result-verdict"></div>
+        <div class="meter-wrap">
+          <div class="meter-top">
+            <span class="meter-title" id="t-meter-title"></span>
+            <span class="meter-text" id="meter-text">―</span>
+          </div>
+          <div class="bar-bg"><div class="bar-fill" id="bar-fill"></div></div>
+          <div class="percent-big" id="percent-big">0%</div>
+        </div>
+        <button class="reset-btn" onclick="reset()" id="t-reset"></button>
+      </div>
+
+      <div id="status"></div>
+    </div>
+
+    <!-- 右: 埋め込み地図(常時パネル) -->
+    <div class="panel panel-map" id="panel-map" style="display:none;">
+      <div class="map-title" id="t-map-title"></div>
+      <div class="map-desc" id="t-map-desc"></div>
+      <button class="make-map-btn" id="make-map-btn" onclick="makeMap()"></button>
+      <div class="map-legend">
+        <span><span class="map-dot" style="background:#ff7a8a;"></span><span id="t-map-yes"></span></span>
+        <span><span class="map-dot" style="background:#5ec5ff;"></span><span id="t-map-no"></span></span>
+      </div>
+      <div id="network"></div>
+      <div class="map-status" id="map-status"></div>
+      <div class="map-note" id="t-map-note"></div>
+    </div>
+
+    <!-- 下: 分析(判断カード・脳グラフ) -->
+    <div class="panel panel-analysis" id="panel-analysis" style="display:none;">
       <div id="judge-card">
         <div class="jc-title" id="t-jc-title"></div>
         <div id="jc-rows"></div>
@@ -229,15 +267,12 @@
         <canvas id="brain-canvas"></canvas>
         <div class="brain-cap" id="brain-cap"></div>
       </div>
-
-      <button class="reset-btn" onclick="reset()" id="t-reset"></button>
     </div>
-
-    <div id="status"></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
+  <script src="https://unpkg.com/vis-network@9.1.9/standalone/umd/vis-network.min.js"></script>
   <script>
     let classifier = null, featClassifier = null, mobileNetModel = null, gyopiAvg = null;
     let heatmapVisible = true, currentMode = 'A', resultShown = false, brainRAF = null;
@@ -292,6 +327,11 @@
         stModeBlocked:'🎨 モードは <a href="train.html">べんきょうページ</a> で おぼえてから つかえるよ',
         verdict:{ yes:'ぎょぴちゃんだ！', maybe:'どっちかな？', no:'ちがうみたい' },
         conf:['ぎょぴちゃんじゃない','ちがう…かな？','うーん、まよう…','ぎょぴちゃん…かな？','たぶん ぎょぴちゃん','ぜったい ぎょぴちゃん！'],
+        mapTitle:'🗺️ AIの あたまの地図',
+        mapDesc:'🧠 まるごと見るAIが「にてる」と 思った えが、ちかくに あつまるよ。にてる ほど 線で つながる。',
+        mapMake:'🗺️ ちずを つくる', mapYes:'ぎょぴちゃん', mapNo:'ちがう',
+        mapNote:'🔴ぎょぴ と 🔵ちがう が べつの かたまりに 分かれたら、AIが ちがいを おぼえた しるし。ノードに さわると どの えか わかるよ。',
+        mapStLoad:'えを よみこみ中…', mapStEmb:'AIが えを おぼえてる…', mapStLink:'にてる えを つないでる…', mapStDone:'できた！ ドラッグで うごかせるよ',
       },
       adult: {
         title:'ぎょぴちゃん判定器',
@@ -327,6 +367,11 @@
         stModeBlocked:'🎨 モードは <a href="train.html">学習ページ</a> で学習後に使えます',
         verdict:{ yes:'ぎょぴちゃんです！', maybe:'どちらとも言えません', no:'ちがいます' },
         conf:['ぎょぴちゃんではない','たぶん違う','判定に迷っています','ぎょぴちゃんかも','たぶんぎょぴちゃん','ほぼ確実にぎょぴちゃん'],
+        mapTitle:'🗺️ 埋め込み地図',
+        mapDesc:'🧠 全体認識AI(MobileNet)が似ていると判断した画像が近くに集まります。類似度が高いほど線で繋がります。',
+        mapMake:'🗺️ 地図を生成', mapYes:'ぎょぴちゃん', mapNo:'ちがう',
+        mapNote:'🔴ぎょぴと🔵ちがうがクラスタに分離していれば、AIが違いを学習できた証拠です。ノードにカーソルを合わせると画像名が出ます。',
+        mapStLoad:'画像読み込み中…', mapStEmb:'埋め込み計算中…', mapStLink:'類似度で接続中…', mapStDone:'完了。ドラッグで操作できます',
       },
     };
     function L(key) { return LANG[curLang][key]; }
@@ -337,7 +382,12 @@
       document.getElementById('t-title').textContent = x.title;
       document.getElementById('t-subtitle').textContent = x.subtitle;
       document.getElementById('nav-link').textContent = x.nav;
-      document.getElementById('map-link').textContent = x.mapLink;
+      document.getElementById('t-map-title').textContent = x.mapTitle;
+      document.getElementById('t-map-desc').textContent = x.mapDesc;
+      document.getElementById('make-map-btn').textContent = x.mapMake;
+      document.getElementById('t-map-yes').textContent = x.mapYes;
+      document.getElementById('t-map-no').textContent = x.mapNo;
+      document.getElementById('t-map-note').textContent = x.mapNote;
       document.getElementById('t-upload').innerHTML = x.upload;
       document.getElementById('t-mode-head').textContent = x.modeHead;
       document.getElementById('t-modeA').textContent = x.modeA;
@@ -420,11 +470,55 @@
       location.reload();
     }
 
+    // ── 埋め込み地図(ローカルのみ: training_data が要る) ──
+    function setMapStatus(m) { document.getElementById('map-status').textContent = m; }
+    function loadImageURL(url) { return new Promise((res, rej) => { const i = new Image(); i.crossOrigin = 'anonymous'; i.onload = () => res(i); i.onerror = rej; i.src = url; }); }
+    function makeThumb(img) { const S = 56, c = document.createElement('canvas'); c.width = c.height = S; const x = c.getContext('2d'), m = Math.min(img.width, img.height); x.drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, S, S); return c.toDataURL('image/jpeg', 0.72); }
+    function cosine(a, b) { let d = 0, na = 0, nb = 0; for (let i = 0; i < a.length; i++) { d += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i]; } return d / (Math.sqrt(na) * Math.sqrt(nb) + 1e-9); }
+
+    async function makeMap() {
+      const btn = document.getElementById('make-map-btn'); btn.disabled = true;
+      try {
+        if (!mobileNetModel) mobileNetModel = await mobilenet.load({ version: 1, alpha: 0.25 });
+        setMapStatus(L('mapStLoad'));
+        const index = await fetch('training_data/index.json').then(r => r.json());
+        const items = [];
+        for (const f of index['ぎょぴちゃん'] || []) items.push({ cls: 'ぎょぴちゃん', f, yes: true });
+        for (const f of index['ぎょぴちゃんじゃない'] || []) items.push({ cls: 'ぎょぴちゃんじゃない', f, yes: false });
+        const embeddings = [];
+        for (let i = 0; i < items.length; i++) {
+          const url = `training_data/${items[i].cls}/${encodeURIComponent(items[i].f)}`;
+          const img = await loadImageURL(url);
+          items[i].thumb = makeThumb(img);
+          const emb = tf.tidy(() => mobileNetModel.infer(img, true));
+          embeddings.push(Array.from(await emb.data())); emb.dispose();
+          setMapStatus(`${L('mapStEmb')} ${i + 1}/${items.length}`);
+          await tf.nextFrame();
+        }
+        const nodes = items.map((it, i) => ({ id: i, label: '', title: `${it.yes ? '🔴' : '🔵'} ${it.f}`, shape: 'circularImage', image: it.thumb, size: 18, borderWidth: 3, color: { background: '#ffffff', border: it.yes ? '#ff7a8a' : '#5ec5ff', highlight: { background: '#ffffff', border: it.yes ? '#ec5e70' : '#3aa8e8' } } }));
+        setMapStatus(L('mapStLink'));
+        const edgeSet = new Set(), edges = [];
+        for (let i = 0; i < embeddings.length; i++) {
+          const sims = [];
+          for (let j = 0; j < embeddings.length; j++) if (i !== j) sims.push({ j, s: cosine(embeddings[i], embeddings[j]) });
+          sims.sort((a, b) => b.s - a.s);
+          for (let k = 0; k < 3 && k < sims.length; k++) { const j = sims[k].j, key = i < j ? `${i}-${j}` : `${j}-${i}`; if (!edgeSet.has(key)) { edgeSet.add(key); edges.push({ from: i, to: j }); } }
+        }
+        new vis.Network(document.getElementById('network'), { nodes: new vis.DataSet(nodes), edges: new vis.DataSet(edges) }, {
+          nodes: { shape: 'dot', borderWidth: 2 }, edges: { color: { color: '#d8deea', highlight: '#ff7a8a' }, width: 0.6, smooth: false },
+          physics: { barnesHut: { gravitationalConstant: -3500, centralGravity: 0.25, springLength: 90, springConstant: 0.04 }, stabilization: { iterations: 250 } },
+          interaction: { hover: true, zoomView: true, dragView: true, tooltipDelay: 120 },
+        });
+        const y = items.filter(i => i.yes).length;
+        setMapStatus(`${L('mapStDone')}（🔴${y} / 🔵${items.length - y}）`);
+      } catch (e) { setMapStatus('⚠️ ' + e.message); btn.disabled = false; }
+    }
+
     // 学習ページ・地図は training_data 必須(ローカルのみ)。train.html が在る時だけ出す
     async function setupNavLink() {
       try {
         const r = await fetch('train.html', { method: 'HEAD' }); if (!r.ok) throw 0;
-        document.getElementById('map-link').style.display = 'inline-block';
+        document.getElementById('panel-map').style.display = 'block';
       } catch (_) {
         const nav = document.getElementById('nav-link'); if (nav) nav.style.display = 'none';
       }
@@ -478,6 +572,7 @@
         document.getElementById('mode-toggle').classList.add('show');
         document.getElementById('t-mode-head').classList.add('show');
         document.getElementById('result').style.display = 'none';
+        document.getElementById('panel-analysis').style.display = 'none';
         document.getElementById('heatmap-canvas').style.display = 'none';
         document.getElementById('heatmap-info').style.display = 'none';
         resultShown = false;
@@ -491,6 +586,7 @@
       const img = document.getElementById('preview');
       if (currentMode === 'A') await judgeMobileNet(img);
       else await judgeFeature(img);
+      document.getElementById('panel-analysis').style.display = 'block';
     }
 
     async function judgeMobileNet(img) {
@@ -718,7 +814,7 @@
 
     function reset() {
       cancelAnimationFrame(brainRAF); _brainDraw = null; resultShown = false; last = null;
-      ['preview-wrap','result','heatmap-info','judge-card','brain-section'].forEach(id => { document.getElementById(id).style.display = 'none'; });
+      ['preview-wrap','result','heatmap-info','judge-card','brain-section','panel-analysis'].forEach(id => { document.getElementById(id).style.display = 'none'; });
       document.getElementById('heatmap-canvas').style.display = 'none';
       document.getElementById('judge-btn').style.display = 'none';
       document.getElementById('mode-toggle').classList.remove('show');

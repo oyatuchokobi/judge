@@ -11,6 +11,7 @@ export_model.mjs
 verify_public.mjs
 verify_graph.mjs
 verify_model.mjs
+verify_dash.mjs
 test_train.mjs
 shot_*.png
 
