@@ -42,11 +42,11 @@
     .mode-head.show { display:block; }
 
     .nav-link {
-      display:inline-block; margin-top:0.7rem; margin-left:0.5rem; color:var(--ink);
-      font-size:0.82rem; font-weight:700; text-decoration:none; background:#fff; border:2px solid var(--line);
-      border-radius:99px; padding:0.35rem 1.1rem; transition:all 0.2s; box-shadow:0 2px 10px rgba(94,197,255,0.12);
+      display:inline-block; margin-top:0.8rem; color:var(--ink);
+      font-size:0.86rem; font-weight:800; text-decoration:none; background:#f3fffb; border:2px solid var(--mint);
+      border-radius:99px; padding:0.45rem 1.3rem; transition:all 0.2s; box-shadow:0 3px 12px rgba(79,209,181,0.22);
     }
-    .nav-link:hover { border-color:var(--sky); transform:translateY(-1px); box-shadow:0 5px 16px rgba(94,197,255,0.22); }
+    .nav-link:hover { background:#e8fff8; border-color:var(--mint); transform:translateY(-1px); box-shadow:0 6px 18px rgba(79,209,181,0.32); }
 
     .card {
       position:relative; background:#fff; border-radius:30px; padding:2rem; width:100%; max-width:480px;
@@ -72,7 +72,7 @@
 
     #preview-wrap { display:none; margin-top:1.2rem; text-align:center; position:relative; z-index:1; }
     #preview-wrap-inner { position:relative; display:inline-block; max-width:100%; }
-    #preview { max-width:100%; max-height:280px; border-radius:18px; box-shadow:0 8px 28px rgba(56,65,90,0.16); object-fit:contain; display:block; border:4px solid #fff; }
+    #preview { max-width:100%; max-height:400px; border-radius:18px; box-shadow:0 8px 28px rgba(56,65,90,0.16); object-fit:contain; display:block; border:4px solid #fff; }
     #heatmap-canvas { display:none; position:absolute; top:0; left:0; width:100%; height:100%; border-radius:14px; pointer-events:none; opacity:0.7; }
 
     .heatmap-info { margin-top:0.8rem; font-size:0.82rem; color:var(--ink-soft); }
@@ -246,10 +246,10 @@
       kid: {
         title:'ぎょぴちゃん はんていマシン',
         subtitle:'この えは ぎょぴちゃん かな？ コンピュータに きいてみよう！',
-        nav:'🎓 べんきょうページ',
+        nav:'🎓 じぶんで AIに おしえる',
         upload:'えを ここに ドロップ してね<br>クリックして えらんでも いいよ',
         modeHead:'🤖 2人の AIが いるよ。どっちに きく？',
-        modeA:'👀 ぱっと見AI', modeB:'🎨 じっくりAI',
+        modeA:'🧠 まるごと見るAI', modeB:'🎨 いろ・かたちAI',
         judge:'これ だれ？', judging:'みてるよ…',
         legend:'🔴 コンピュータが よく見た ところ　/　① いちばんの てがかり',
         note:'※ ほんとは いろも かたちも ぜんぶ 見てるよ。でも コンピュータの あたまの中は のぞけないんだ。だから「どこ」を 見たかだけ おしえてくれるよ。',
@@ -261,7 +261,7 @@
         jcNote:'※「ぎょぴっぽさ」= ぎょぴちゃんに どれだけ にてるか。「きいた」= その とくちょうが はんていに どれだけ きいたか。',
         matchLabel:'ぎょぴっぽさ', effPrefix:'きいた ',
         brainTitleA:'コンピュータの あたまの中（のぞけない）👀',
-        brainCapA:'脳細胞が 多すぎて 中は 見えないんだ。だから「どこを 見たか」だけ わかるよ。',
+        brainCapA:'人間の あたまみたいに、ちいさな のうさいぼう（ニューロン）が いっぱい あつまってるよ。多すぎて 中は 見えないんだ。だから「どこを 見たか」だけ わかるよ。',
         brainTitleB:'コンピュータの あたまの中（ほんもの）🎨',
         brainCapB:'ひかる線 = いま はたらいてる ところ。ふとい線 = つよい つながり。',
         stLoading:'じゅんびちゅう',
@@ -278,10 +278,10 @@
       adult: {
         title:'ぎょぴちゃん判定器',
         subtitle:'この画像がぎょぴちゃんかどうか、AIに判定させます',
-        nav:'🎓 学習ページ',
+        nav:'🎓 学習ページ（自分でAIに教える）',
         upload:'画像をドラッグ＆ドロップ<br>またはクリックして選択',
         modeHead:'🤖 別々のAIモデル。どちらで判定?',
-        modeA:'👀 直感AI', modeB:'🎨 特徴AI',
+        modeA:'🧠 全体認識AI', modeB:'🎨 色・形 特徴AI',
         judge:'判定する', judging:'判定中…',
         legend:'🔴 AIが注目した領域　/　① 最も影響した場所',
         note:'※ 実際は色も形もすべて使っています。ただしモデル内部は解釈できないため、可視化できるのは「どこ」を見たか（位置）のみです。',
@@ -293,7 +293,7 @@
         jcNote:'※「ぎょぴっぽさ」=ぎょぴちゃん平均との近さ（一致度）。「きいた」=その特徴が判定に与えた影響（寄与度・近似）。',
         matchLabel:'ぎょぴっぽさ', effPrefix:'効き ',
         brainTitleA:'AIの頭の中（のぞけない）👀',
-        brainCapA:'ニューロンが多すぎて内部は解釈できません。だから「どこを見たか」だけが分かります。',
+        brainCapA:'人間の脳と同じように、無数のニューロン（神経細胞）が組み合わさっています。多すぎて内部は解釈できません。だから「どこを見たか」だけが分かります。',
         brainTitleB:'AIの頭の中（解釈可能）🎨',
         brainCapB:'光る線=活性中の経路。太い線=強い結合（重み大）。',
         stLoading:'準備中',
@@ -552,16 +552,16 @@
       scores.forEach((score, i) => {
         if (score <= 0) return;
         const t = score / maxPos, green = Math.round(80 + (1 - t) * 130);
-        ctx.fillStyle = `rgba(255, ${green}, 40, ${0.25 + t * 0.55})`;
+        ctx.fillStyle = `rgba(255, ${green}, 40, ${0.35 + t * 0.55})`;
         ctx.fillRect((i%gridSize)*cellW, Math.floor(i/gridSize)*cellH, cellW, cellH);
       });
       const top1 = scores.map((s,i) => ({s,i})).sort((a,b) => b.s - a.s)[0];
       if (top1 && top1.s > 0) {
-        const cx = ((top1.i%gridSize)+0.5)*cellW, cy = (Math.floor(top1.i/gridSize)+0.5)*cellH, r = Math.min(cellW, cellH)*0.34;
-        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fillStyle = 'rgba(255,255,255,0.95)'; ctx.fill();
-        ctx.lineWidth = Math.max(2, r*0.12); ctx.strokeStyle = '#ff4040'; ctx.stroke();
+        const cx = ((top1.i%gridSize)+0.5)*cellW, cy = (Math.floor(top1.i/gridSize)+0.5)*cellH, r = Math.min(cellW, cellH)*0.46;
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fillStyle = 'rgba(255,255,255,0.96)'; ctx.fill();
+        ctx.lineWidth = Math.max(3, r*0.16); ctx.strokeStyle = '#ff4040'; ctx.stroke();
         ctx.fillStyle = '#ff4040'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.font = `bold ${Math.round(r*1.2)}px sans-serif`; ctx.fillText('1', cx, cy + r*0.05);
+        ctx.font = `bold ${Math.round(r*1.3)}px sans-serif`; ctx.fillText('1', cx, cy + r*0.05);
       }
     }
     function toggleHeatmap() {
