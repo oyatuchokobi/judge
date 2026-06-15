@@ -442,23 +442,32 @@
     function makeThumb(img) { const S = 56, c = document.createElement('canvas'); c.width = c.height = S; const x = c.getContext('2d'), m = Math.min(img.width, img.height); x.drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, S, S); return c.toDataURL('image/jpeg', 0.72); }
     function cosine(a, b) { let d = 0, na = 0, nb = 0; for (let i = 0; i < a.length; i++) { d += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i]; } return d / (Math.sqrt(na) * Math.sqrt(nb) + 1e-9); }
     async function makeMap() {
-      const btn = document.getElementById('make-map-btn'); btn.disabled = true;
+      const btn = document.getElementById('make-map-btn'); if (btn) btn.disabled = true;
       try {
-        if (!mobileNetModel) mobileNetModel = await mobilenet.load({ version: 1, alpha: 0.25 });
-        setMapStatus(L('mapStLoad'));
-        const index = await fetch('training_data/index.json').then(r => r.json());
-        const items = [];
-        for (const f of index['ぎょぴちゃん'] || []) items.push({ cls: 'ぎょぴちゃん', f, yes: true });
-        for (const f of index['ぎょぴちゃんじゃない'] || []) items.push({ cls: 'ぎょぴちゃんじゃない', f, yes: false });
-        const embeddings = [];
-        for (let i = 0; i < items.length; i++) {
-          const url = `training_data/${items[i].cls}/${encodeURIComponent(items[i].f)}`;
-          const img = await loadImageURL(url);
-          items[i].thumb = makeThumb(img);
-          const emb = tf.tidy(() => mobileNetModel.infer(img, true));
-          embeddings.push(Array.from(await emb.data())); emb.dispose();
-          setMapStatus(`${L('mapStEmb')} ${i + 1}/${items.length}`);
-          await tf.nextFrame();
+        let items, embeddings;
+        const cached = JSON.parse(localStorage.getItem('gyopi-map-data') || 'null');
+        if (cached && cached.length) {
+          // 学習時に保存された地図データ(即・計算なし)。自分の学習画像が反映される
+          items = cached.map((d, i) => ({ yes: d.yes, thumb: d.thumb, f: '#' + (i + 1) }));
+          embeddings = cached.map(d => d.emb);
+        } else {
+          // フォールバック: 同梱 training_data から その場で計算(重い)
+          if (!mobileNetModel) mobileNetModel = await mobilenet.load({ version: 1, alpha: 0.25 });
+          setMapStatus(L('mapStLoad'));
+          const index = await fetch('training_data/index.json').then(r => r.json());
+          items = [];
+          for (const f of index['ぎょぴちゃん'] || []) items.push({ cls: 'ぎょぴちゃん', f, yes: true });
+          for (const f of index['ぎょぴちゃんじゃない'] || []) items.push({ cls: 'ぎょぴちゃんじゃない', f, yes: false });
+          embeddings = [];
+          for (let i = 0; i < items.length; i++) {
+            const url = `training_data/${items[i].cls}/${encodeURIComponent(items[i].f)}`;
+            const img = await loadImageURL(url);
+            items[i].thumb = makeThumb(img);
+            const emb = tf.tidy(() => mobileNetModel.infer(img, true));
+            embeddings.push(Array.from(await emb.data())); emb.dispose();
+            setMapStatus(`${L('mapStEmb')} ${i + 1}/${items.length}`);
+            await tf.nextFrame();
+          }
         }
         const nodes = items.map((it, i) => ({ id: i, label: '', title: `${it.yes ? '🔴' : '🔵'} ${it.f}`, shape: 'circularImage', image: it.thumb, size: 18, borderWidth: 3, color: { background: '#ffffff', border: it.yes ? '#ff7a8a' : '#5ec5ff', highlight: { background: '#ffffff', border: it.yes ? '#ec5e70' : '#3aa8e8' } } }));
         setMapStatus(L('mapStLink'));
@@ -476,16 +485,22 @@
         });
         const y = items.filter(i => i.yes).length;
         setMapStatus(`${L('mapStDone')}（🔴${y} / 🔵${items.length - y}）`);
-      } catch (e) { setMapStatus('⚠️ ' + e.message); btn.disabled = false; }
+        if (btn) btn.disabled = false;
+      } catch (e) { setMapStatus('⚠️ ' + e.message); if (btn) btn.disabled = false; }
     }
 
     async function setupNavLink() {
+      const hasMapData = !!localStorage.getItem('gyopi-map-data');
       try {
         const r = await fetch('train.html', { method: 'HEAD' }); if (!r.ok) throw 0;
         document.getElementById('panel-map').style.display = 'block';
       } catch (_) {
         const nav = document.getElementById('nav-link'); if (nav) nav.style.display = 'none';
+        if (!hasMapData) return; // 公開版で地図データも無ければ何もしない
+        document.getElementById('panel-map').style.display = 'block'; // 地図データが在れば公開でも出す
       }
+      // 学習で保存した地図データが在れば、ボタン無しで自動表示
+      if (hasMapData) { document.getElementById('make-map-btn').style.display = 'none'; makeMap(); }
     }
 
     async function loadModel() {
