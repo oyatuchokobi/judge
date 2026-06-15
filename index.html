@@ -7,163 +7,131 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐟</text></svg>">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --coral:  #ff7a8a;
-      --amber:  #ffc93c;
-      --sky:    #5ec5ff;
-      --mint:   #4fd1b5;
-      --violet: #b794f6;
-      --ink:    #38415a;
-      --ink-soft: #8a93ab;
-      --line:   #eef1f7;
+      --coral:#ff7a8a; --amber:#ffc93c; --sky:#5ec5ff; --mint:#4fd1b5; --violet:#b794f6;
+      --ink:#38415a; --ink-soft:#8a93ab; --line:#eef1f7;
     }
-
     body {
-      font-family: 'Hiragino Maru Gothic ProN', 'Rounded Mplus 1c', 'Quicksand', system-ui, sans-serif;
-      min-height: 100vh;
-      background: #f7f9fc;
+      font-family: 'Hiragino Maru Gothic ProN','Rounded Mplus 1c','Quicksand',system-ui,sans-serif;
+      min-height:100vh; background:#f7f9fc;
       background-image:
         radial-gradient(ellipse at 8% 0%,   #ffe3ec 0%, transparent 40%),
         radial-gradient(ellipse at 92% 6%,  #d8f3ff 0%, transparent 38%),
         radial-gradient(ellipse at 50% 100%,#d6fff0 0%, transparent 45%),
         radial-gradient(ellipse at 88% 96%, #fff4d6 0%, transparent 40%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2.5rem 1rem 3rem;
-      color: var(--ink);
+      display:flex; flex-direction:column; align-items:center; padding:2.5rem 1rem 3rem; color:var(--ink);
     }
-
-    /* ── ヘッダー ── */
-    .header { text-align: center; margin-bottom: 1.6rem; }
-    .fish-mark { width: 64px; height: 64px; display: block; margin: 0 auto 0.4rem; animation: floatBob 3s ease-in-out infinite; }
+    .header { text-align:center; margin-bottom:1.6rem; }
+    .fish-mark { width:64px; height:64px; display:block; margin:0 auto 0.4rem; animation:floatBob 3s ease-in-out infinite; }
     h1 {
-      font-size: 2rem; font-weight: 800; letter-spacing: 0.01em;
-      background: linear-gradient(100deg, var(--coral) 0%, var(--amber) 35%, var(--mint) 65%, var(--sky) 100%);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-      animation: titleBounce 0.6s cubic-bezier(.36,.07,.19,.97) both;
+      font-size:2rem; font-weight:800; letter-spacing:0.01em;
+      background:linear-gradient(100deg,var(--coral) 0%,var(--amber) 35%,var(--mint) 65%,var(--sky) 100%);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+      animation:titleBounce 0.6s cubic-bezier(.36,.07,.19,.97) both;
     }
     @keyframes titleBounce { 0%{transform:scale(0.8);opacity:0} 70%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
-    .subtitle { color: var(--ink-soft); font-size: 0.9rem; margin-top: 0.35rem; letter-spacing: 0.02em; }
+    .subtitle { color:var(--ink-soft); font-size:0.9rem; margin-top:0.35rem; letter-spacing:0.02em; }
+
+    /* 言語トグル(こども/おとな) */
+    .lang-toggle { display:inline-flex; margin-top:0.9rem; background:#eef1f7; border-radius:99px; padding:3px; gap:3px; }
+    .lang-btn { border:none; background:transparent; padding:0.35rem 0.9rem; border-radius:99px; font-weight:800; font-size:0.8rem; color:var(--ink-soft); cursor:pointer; font-family:inherit; transition:all 0.2s; }
+    .lang-btn.active { background:#fff; color:var(--ink); box-shadow:0 2px 8px rgba(56,65,90,0.12); }
+
     .nav-link {
-      display: inline-block; margin-top: 0.9rem; color: var(--ink);
-      font-size: 0.82rem; font-weight: 700; text-decoration: none;
-      background: #fff; border: 2px solid var(--line); border-radius: 99px;
-      padding: 0.35rem 1.1rem; transition: all 0.2s; box-shadow: 0 2px 10px rgba(94,197,255,0.12);
+      display:inline-block; margin-top:0.7rem; margin-left:0.5rem; color:var(--ink);
+      font-size:0.82rem; font-weight:700; text-decoration:none; background:#fff; border:2px solid var(--line);
+      border-radius:99px; padding:0.35rem 1.1rem; transition:all 0.2s; box-shadow:0 2px 10px rgba(94,197,255,0.12);
     }
-    .nav-link:hover { border-color: var(--sky); transform: translateY(-1px); box-shadow: 0 5px 16px rgba(94,197,255,0.22); }
+    .nav-link:hover { border-color:var(--sky); transform:translateY(-1px); box-shadow:0 5px 16px rgba(94,197,255,0.22); }
 
-    /* ── カード ── */
     .card {
-      position: relative; background: #fff; border-radius: 30px; padding: 2rem;
-      width: 100%; max-width: 480px;
-      box-shadow: 0 16px 48px rgba(56,65,90,0.10), 0 3px 10px rgba(56,65,90,0.04);
-      border: 1px solid var(--line); overflow: hidden;
+      position:relative; background:#fff; border-radius:30px; padding:2rem; width:100%; max-width:480px;
+      box-shadow:0 16px 48px rgba(56,65,90,0.10),0 3px 10px rgba(56,65,90,0.04); border:1px solid var(--line); overflow:hidden;
     }
-    .card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px;
-      background: linear-gradient(90deg, var(--coral), var(--amber), var(--mint), var(--sky), var(--violet));
-    }
-    .bubble-deco { position: absolute; border-radius: 50%; opacity: 0.5; pointer-events: none; }
-    .bubble-deco.b1 { width: 70px; height: 70px; background: #ffe3ec; top: 30px; right: -22px; }
-    .bubble-deco.b2 { width: 44px; height: 44px; background: #d8f3ff; bottom: 24px; left: -16px; }
+    .card::before { content:''; position:absolute; top:0; left:0; right:0; height:6px; background:linear-gradient(90deg,var(--coral),var(--amber),var(--mint),var(--sky),var(--violet)); }
+    .bubble-deco { position:absolute; border-radius:50%; opacity:0.5; pointer-events:none; }
+    .bubble-deco.b1 { width:70px; height:70px; background:#ffe3ec; top:30px; right:-22px; }
+    .bubble-deco.b2 { width:44px; height:44px; background:#d8f3ff; bottom:24px; left:-16px; }
 
-    /* ── アップロード ── */
-    .upload-area {
-      position: relative; z-index: 1; border: 2.5px dashed #d8deea; border-radius: 22px;
-      padding: 2.2rem 1.5rem; text-align: center; cursor: pointer; background: #fbfcfe; transition: all 0.25s;
-    }
-    .upload-area:hover, .upload-area.dragover { border-color: var(--mint); background: #f3fffb; box-shadow: 0 0 0 5px rgba(79,209,181,0.10); }
-    .upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-    .upload-icon { font-size: 3rem; margin-bottom: 0.4rem; display: block; animation: floatBob 2.4s ease-in-out infinite; }
+    .upload-area { position:relative; z-index:1; border:2.5px dashed #d8deea; border-radius:22px; padding:2.2rem 1.5rem; text-align:center; cursor:pointer; background:#fbfcfe; transition:all 0.25s; }
+    .upload-area:hover, .upload-area.dragover { border-color:var(--mint); background:#f3fffb; box-shadow:0 0 0 5px rgba(79,209,181,0.10); }
+    .upload-area input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; }
+    .upload-icon { font-size:3rem; margin-bottom:0.4rem; display:block; animation:floatBob 2.4s ease-in-out infinite; }
     @keyframes floatBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
-    .upload-text { color: var(--ink-soft); font-size: 0.92rem; line-height: 1.7; }
+    .upload-text { color:var(--ink-soft); font-size:0.92rem; line-height:1.7; }
 
-    /* ── モード切替 ── */
-    .mode-toggle { display: none; margin-top: 1.3rem; background: #eef1f7; border-radius: 99px; padding: 4px; gap: 4px; position: relative; z-index: 1; }
-    .mode-toggle.show { display: flex; }
-    .mode-btn {
-      flex: 1; border: none; background: transparent; padding: 0.6rem 0.4rem; border-radius: 99px;
-      font-weight: 800; font-size: 0.9rem; color: var(--ink-soft); cursor: pointer; font-family: inherit; transition: all 0.2s;
-    }
-    .mode-btn.active { background: #fff; color: var(--ink); box-shadow: 0 2px 8px rgba(56,65,90,0.12); }
-    .mode-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .mode-toggle { display:none; margin-top:1.3rem; background:#eef1f7; border-radius:99px; padding:4px; gap:4px; position:relative; z-index:1; }
+    .mode-toggle.show { display:flex; }
+    .mode-btn { flex:1; border:none; background:transparent; padding:0.6rem 0.4rem; border-radius:99px; font-weight:800; font-size:0.9rem; color:var(--ink-soft); cursor:pointer; font-family:inherit; transition:all 0.2s; }
+    .mode-btn.active { background:#fff; color:var(--ink); box-shadow:0 2px 8px rgba(56,65,90,0.12); }
+    .mode-btn:disabled { opacity:0.4; cursor:not-allowed; }
 
-    /* ── プレビュー ── */
-    #preview-wrap { display: none; margin-top: 1.2rem; text-align: center; position: relative; z-index: 1; }
-    #preview-wrap-inner { position: relative; display: inline-block; max-width: 100%; }
-    #preview { max-width: 100%; max-height: 280px; border-radius: 18px; box-shadow: 0 8px 28px rgba(56,65,90,0.16); object-fit: contain; display: block; border: 4px solid #fff; }
-    #heatmap-canvas { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 14px; pointer-events: none; opacity: 0.7; }
+    #preview-wrap { display:none; margin-top:1.2rem; text-align:center; position:relative; z-index:1; }
+    #preview-wrap-inner { position:relative; display:inline-block; max-width:100%; }
+    #preview { max-width:100%; max-height:280px; border-radius:18px; box-shadow:0 8px 28px rgba(56,65,90,0.16); object-fit:contain; display:block; border:4px solid #fff; }
+    #heatmap-canvas { display:none; position:absolute; top:0; left:0; width:100%; height:100%; border-radius:14px; pointer-events:none; opacity:0.7; }
 
-    .heatmap-info { margin-top: 0.8rem; font-size: 0.82rem; color: var(--ink-soft); }
-    .heatmap-legend { margin-bottom: 0.5rem; line-height: 1.9; font-weight: 700; color: var(--ink); }
-    .heatmap-note { font-size: 0.74rem; color: var(--ink-soft); line-height: 1.6; background: #fbfcfe; border: 1px solid var(--line); border-radius: 12px; padding: 0.55rem 0.8rem; margin-bottom: 0.5rem; text-align: left; }
-    .toggle-heatmap-btn { background: #fff; border: 2px solid var(--line); color: var(--ink); border-radius: 99px; padding: 0.35rem 1.1rem; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: all 0.18s; font-family: inherit; }
-    .toggle-heatmap-btn:hover { border-color: var(--sky); box-shadow: 0 2px 10px rgba(94,197,255,0.18); }
+    .heatmap-info { margin-top:0.8rem; font-size:0.82rem; color:var(--ink-soft); }
+    .heatmap-legend { margin-bottom:0.5rem; line-height:1.9; font-weight:700; color:var(--ink); }
+    .heatmap-note { font-size:0.74rem; color:var(--ink-soft); line-height:1.6; background:#fbfcfe; border:1px solid var(--line); border-radius:12px; padding:0.55rem 0.8rem; margin-bottom:0.5rem; text-align:left; }
+    .toggle-heatmap-btn { background:#fff; border:2px solid var(--line); color:var(--ink); border-radius:99px; padding:0.35rem 1.1rem; font-size:0.8rem; font-weight:700; cursor:pointer; transition:all 0.18s; font-family:inherit; }
+    .toggle-heatmap-btn:hover { border-color:var(--sky); box-shadow:0 2px 10px rgba(94,197,255,0.18); }
 
-    /* ── はんていボタン ── */
     #judge-btn {
-      display: none; position: relative; z-index: 1; margin-top: 1.3rem; width: 100%; padding: 1.05rem;
-      font-size: 1.2rem; font-weight: 800; letter-spacing: 0.04em; color: #fff;
-      background: linear-gradient(120deg, var(--coral), var(--amber)); border: none; border-radius: 99px; cursor: pointer; transition: all 0.2s;
-      box-shadow: 0 8px 22px rgba(255,122,138,0.40), 0 2px 0 #ec5e70; font-family: inherit;
+      display:none; position:relative; z-index:1; margin-top:1.3rem; width:100%; padding:1.05rem;
+      font-size:1.2rem; font-weight:800; letter-spacing:0.04em; color:#fff;
+      background:linear-gradient(120deg,var(--coral),var(--amber)); border:none; border-radius:99px; cursor:pointer; transition:all 0.2s;
+      box-shadow:0 8px 22px rgba(255,122,138,0.40),0 2px 0 #ec5e70; font-family:inherit;
     }
-    #judge-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(255,122,138,0.50), 0 2px 0 #ec5e70; }
-    #judge-btn:active { transform: translateY(1px); box-shadow: 0 4px 14px rgba(255,122,138,0.35); }
-    #judge-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+    #judge-btn:hover { transform:translateY(-2px); box-shadow:0 12px 30px rgba(255,122,138,0.50),0 2px 0 #ec5e70; }
+    #judge-btn:active { transform:translateY(1px); box-shadow:0 4px 14px rgba(255,122,138,0.35); }
+    #judge-btn:disabled { opacity:0.55; cursor:not-allowed; transform:none; }
 
-    /* ── けっか ── */
-    #result { display: none; margin-top: 1.8rem; text-align: center; position: relative; z-index: 1; animation: popIn 0.45s cubic-bezier(.36,.07,.19,.97) both; }
+    #result { display:none; margin-top:1.8rem; text-align:center; position:relative; z-index:1; animation:popIn 0.45s cubic-bezier(.36,.07,.19,.97) both; }
     @keyframes popIn { 0%{transform:scale(0.8);opacity:0} 65%{transform:scale(1.06)} 100%{transform:scale(1);opacity:1} }
-    .result-badge { font-size: 4.2rem; line-height: 1; }
-    .result-badge.yes { animation: wiggle 0.5s ease 0.35s both; }
+    .result-badge { font-size:4.2rem; line-height:1; }
+    .result-badge.yes { animation:wiggle 0.5s ease 0.35s both; }
     @keyframes wiggle { 0%,100%{transform:rotate(0)} 25%{transform:rotate(-8deg)} 50%{transform:rotate(8deg)} 75%{transform:rotate(-4deg)} }
-    .result-verdict { font-size: 1.6rem; font-weight: 800; margin-top: 0.4rem; }
-    .result-verdict.yes { color: var(--coral); }
-    .result-verdict.maybe { color: #e6a700; }
-    .result-verdict.no { color: var(--sky); }
+    .result-verdict { font-size:1.6rem; font-weight:800; margin-top:0.4rem; }
+    .result-verdict.yes { color:var(--coral); }
+    .result-verdict.maybe { color:#e6a700; }
+    .result-verdict.no { color:var(--sky); }
 
-    /* ── じしんメーター ── */
-    .meter-wrap { margin-top: 1.5rem; background: #fbfcfe; border: 1px solid var(--line); border-radius: 18px; padding: 1rem 1.1rem; }
-    .meter-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.55rem; }
-    .meter-title { font-size: 0.82rem; font-weight: 700; color: var(--ink-soft); }
-    .meter-text { font-size: 1.05rem; font-weight: 800; color: var(--ink); }
-    .bar-bg { background: #eef1f7; border-radius: 99px; height: 16px; overflow: hidden; }
-    .bar-fill { height: 100%; border-radius: 99px; width: 0%; transition: width 0.9s cubic-bezier(.22,.68,0,1.2); background: linear-gradient(90deg, var(--amber), var(--coral)); }
-    .bar-fill.mid { background: linear-gradient(90deg, #ffe08a, var(--amber)); }
-    .bar-fill.low { background: linear-gradient(90deg, var(--sky), var(--violet)); }
-    .percent-big { font-size: 2.6rem; font-weight: 800; margin-top: 0.5rem; letter-spacing: -0.03em; color: var(--ink); }
+    .meter-wrap { margin-top:1.5rem; background:#fbfcfe; border:1px solid var(--line); border-radius:18px; padding:1rem 1.1rem; }
+    .meter-top { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:0.55rem; }
+    .meter-title { font-size:0.82rem; font-weight:700; color:var(--ink-soft); }
+    .meter-text { font-size:1.05rem; font-weight:800; color:var(--ink); }
+    .bar-bg { background:#eef1f7; border-radius:99px; height:16px; overflow:hidden; }
+    .bar-fill { height:100%; border-radius:99px; width:0%; transition:width 0.9s cubic-bezier(.22,.68,0,1.2); background:linear-gradient(90deg,var(--amber),var(--coral)); }
+    .bar-fill.mid { background:linear-gradient(90deg,#ffe08a,var(--amber)); }
+    .bar-fill.low { background:linear-gradient(90deg,var(--sky),var(--violet)); }
+    .percent-big { font-size:2.6rem; font-weight:800; margin-top:0.5rem; letter-spacing:-0.03em; color:var(--ink); }
 
-    /* ── 判断カード(モードB) ── */
-    #judge-card { display: none; margin-top: 1.5rem; text-align: left; }
-    .jc-title { font-weight: 800; font-size: 0.98rem; margin-bottom: 0.9rem; color: var(--ink); text-align: center; }
-    .jc-row { margin-bottom: 0.7rem; padding: 0.65rem 0.8rem; border: 1px solid var(--line); border-radius: 14px; background: #fff; transition: opacity 0.35s; }
-    .jc-row.dim { opacity: 0.38; }
-    .jc-row.place { opacity: 0.55; background: #fbfcfe; }
-    .jc-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem; }
-    .jc-name { font-weight: 800; font-size: 0.88rem; }
-    .jc-eff { font-size: 0.72rem; font-weight: 800; padding: 0.18rem 0.65rem; border-radius: 99px; background: #eef1f7; color: var(--ink-soft); white-space: nowrap; }
-    .jc-eff.strong { background: linear-gradient(90deg, var(--coral), var(--amber)); color: #fff; }
-    .jc-bar-label { font-size: 0.74rem; color: var(--ink-soft); margin-bottom: 0.25rem; }
-    .jc-bar-label b { color: var(--ink); }
-    .jc-bar-bg { height: 11px; background: #eef1f7; border-radius: 99px; overflow: hidden; }
-    .jc-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--mint), var(--sky)); width: 0%; transition: width 0.8s cubic-bezier(.22,.68,0,1.2); }
+    #judge-card { display:none; margin-top:1.5rem; text-align:left; }
+    .jc-title { font-weight:800; font-size:0.98rem; margin-bottom:0.9rem; color:var(--ink); text-align:center; }
+    .jc-row { margin-bottom:0.7rem; padding:0.65rem 0.8rem; border:1px solid var(--line); border-radius:14px; background:#fff; transition:opacity 0.35s; }
+    .jc-row.dim { opacity:0.38; }
+    .jc-row.place { opacity:0.55; background:#fbfcfe; }
+    .jc-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:0.45rem; }
+    .jc-name { font-weight:800; font-size:0.88rem; }
+    .jc-eff { font-size:0.72rem; font-weight:800; padding:0.18rem 0.65rem; border-radius:99px; background:#eef1f7; color:var(--ink-soft); white-space:nowrap; }
+    .jc-eff.strong { background:linear-gradient(90deg,var(--coral),var(--amber)); color:#fff; }
+    .jc-bar-label { font-size:0.74rem; color:var(--ink-soft); margin-bottom:0.25rem; }
+    .jc-bar-label b { color:var(--ink); }
+    .jc-bar-bg { height:11px; background:#eef1f7; border-radius:99px; overflow:hidden; }
+    .jc-bar-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,var(--mint),var(--sky)); width:0%; transition:width 0.8s cubic-bezier(.22,.68,0,1.2); }
 
-    /* ── 脳みそグラフ ── */
-    #brain-section { display: none; margin-top: 1.5rem; }
-    .brain-title { font-weight: 800; font-size: 0.95rem; text-align: center; color: var(--ink); margin-bottom: 0.5rem; }
-    #brain-canvas { width: 100%; display: block; background: #fbfcfe; border: 1px solid var(--line); border-radius: 16px; }
-    .brain-cap { font-size: 0.74rem; color: var(--ink-soft); text-align: center; margin-top: 0.4rem; line-height: 1.6; }
+    #brain-section { display:none; margin-top:1.5rem; }
+    .brain-title { font-weight:800; font-size:0.95rem; text-align:center; color:var(--ink); margin-bottom:0.5rem; }
+    #brain-canvas { width:100%; display:block; background:#fbfcfe; border:1px solid var(--line); border-radius:16px; }
+    .brain-cap { font-size:0.74rem; color:var(--ink-soft); text-align:center; margin-top:0.4rem; line-height:1.6; }
 
-    /* ── もういちまい ── */
-    .reset-btn { margin-top: 1.4rem; background: #fff; border: 2px solid var(--line); color: var(--ink-soft); border-radius: 99px; padding: 0.55rem 1.9rem; cursor: pointer; font-size: 0.92rem; font-weight: 700; transition: all 0.2s; font-family: inherit; }
-    .reset-btn:hover { border-color: var(--coral); color: var(--coral); transform: translateY(-1px); }
+    .reset-btn { margin-top:1.4rem; background:#fff; border:2px solid var(--line); color:var(--ink-soft); border-radius:99px; padding:0.55rem 1.9rem; cursor:pointer; font-size:0.92rem; font-weight:700; transition:all 0.2s; font-family:inherit; }
+    .reset-btn:hover { border-color:var(--coral); color:var(--coral); transform:translateY(-1px); }
 
-    /* ── ステータス ── */
-    #status { margin-top: 1.1rem; font-size: 0.85rem; color: var(--ink-soft); text-align: center; min-height: 1.3em; position: relative; z-index: 1; }
-    #status a { color: var(--coral); font-weight: 700; }
-    .loading-dots::after { content: ''; animation: dots 1.2s steps(4,end) infinite; }
+    #status { margin-top:1.1rem; font-size:0.85rem; color:var(--ink-soft); text-align:center; min-height:1.3em; position:relative; z-index:1; }
+    #status a { color:var(--coral); font-weight:700; }
+    .loading-dots::after { content:''; animation:dots 1.2s steps(4,end) infinite; }
     @keyframes dots { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
   </style>
 </head>
@@ -173,15 +141,19 @@
       <ellipse cx="28" cy="34" rx="20" ry="14" fill="#5ec5ff"/>
       <ellipse cx="28" cy="34" rx="20" ry="14" fill="url(#g)" opacity="0.5"/>
       <path d="M48 34 L62 24 L60 34 L62 44 Z" fill="#ffc93c"/>
-      <circle cx="20" cy="30" r="3.4" fill="#fff"/>
-      <circle cx="19" cy="31" r="1.7" fill="#38415a"/>
-      <circle cx="36" cy="26" r="2" fill="#fff" opacity="0.8"/>
-      <circle cx="42" cy="40" r="1.4" fill="#fff" opacity="0.7"/>
+      <circle cx="20" cy="30" r="3.4" fill="#fff"/><circle cx="19" cy="31" r="1.7" fill="#38415a"/>
+      <circle cx="36" cy="26" r="2" fill="#fff" opacity="0.8"/><circle cx="42" cy="40" r="1.4" fill="#fff" opacity="0.7"/>
       <defs><linearGradient id="g" x1="8" y1="20" x2="48" y2="48" gradientUnits="userSpaceOnUse"><stop stop-color="#4fd1b5"/><stop offset="1" stop-color="#b794f6"/></linearGradient></defs>
     </svg>
-    <h1>ぎょぴちゃん はんていマシン</h1>
-    <p class="subtitle">この えは ぎょぴちゃん かな？ コンピュータに きいてみよう！</p>
-    <a href="train.html" class="nav-link">🎓 べんきょうページ</a>
+    <h1 id="t-title"></h1>
+    <p class="subtitle" id="t-subtitle"></p>
+    <div>
+      <span class="lang-toggle">
+        <button class="lang-btn" data-lang="kid" onclick="setLang('kid')">🧒 こども</button>
+        <button class="lang-btn" data-lang="adult" onclick="setLang('adult')">🧑 おとな</button>
+      </span>
+      <a href="train.html" class="nav-link" id="nav-link"></a>
+    </div>
   </div>
 
   <div class="card">
@@ -191,28 +163,27 @@
     <div class="upload-area" id="upload-area">
       <input type="file" id="file-input" accept="image/*">
       <div class="upload-icon">🖼️</div>
-      <div class="upload-text">えを ここに ドロップ してね<br>クリックして えらんでも いいよ</div>
+      <div class="upload-text" id="t-upload"></div>
     </div>
 
-    <!-- モード切替: コンピュータの「見かた」を えらぶ -->
     <div class="mode-toggle" id="mode-toggle">
-      <button class="mode-btn active" data-mode="A" onclick="setMode('A')">👀 どこ見た？</button>
-      <button class="mode-btn" data-mode="B" id="mode-btn-b" onclick="setMode('B')">🎨 なぜ？</button>
+      <button class="mode-btn active" data-mode="A" onclick="setMode('A')" id="t-modeA"></button>
+      <button class="mode-btn" data-mode="B" id="mode-btn-b" onclick="setMode('B')"></button>
     </div>
 
     <div id="preview-wrap">
       <div id="preview-wrap-inner">
-        <img id="preview" src="" alt="プレビュー">
+        <img id="preview" src="" alt="preview">
         <canvas id="heatmap-canvas"></canvas>
       </div>
       <div class="heatmap-info" id="heatmap-info" style="display:none;">
-        <div class="heatmap-legend">🔴 コンピュータが よく見た ところ　/　① いちばんの てがかり</div>
-        <div class="heatmap-note">※ ほんとは いろも かたちも ぜんぶ 見てるよ。でも コンピュータの あたまの中は のぞけないんだ。だから「どこ」を 見たかだけ おしえてくれるよ。</div>
-        <button class="toggle-heatmap-btn" id="toggle-heatmap" onclick="toggleHeatmap()">🗺️ ちずを かくす</button>
+        <div class="heatmap-legend" id="t-legend"></div>
+        <div class="heatmap-note" id="t-note"></div>
+        <button class="toggle-heatmap-btn" id="toggle-heatmap" onclick="toggleHeatmap()"></button>
       </div>
     </div>
 
-    <button id="judge-btn" onclick="judge()">これ だれ？</button>
+    <button id="judge-btn" onclick="judge()"></button>
 
     <div id="result">
       <div class="result-badge" id="result-badge"></div>
@@ -220,130 +191,203 @@
 
       <div class="meter-wrap">
         <div class="meter-top">
-          <span class="meter-title">コンピュータの じしん</span>
+          <span class="meter-title" id="t-meter-title"></span>
           <span class="meter-text" id="meter-text">―</span>
         </div>
         <div class="bar-bg"><div class="bar-fill" id="bar-fill"></div></div>
         <div class="percent-big" id="percent-big">0%</div>
       </div>
 
-      <!-- モードB: どの とくちょうで きめたか -->
       <div id="judge-card">
-        <div class="jc-title">どの とくちょうで きめた？ 🎨</div>
+        <div class="jc-title" id="t-jc-title"></div>
         <div id="jc-rows"></div>
         <div class="jc-row place">
-          <div class="jc-head"><span class="jc-name">📍 ばしょ</span><span class="jc-eff">見てない</span></div>
-          <div class="jc-bar-label">モードB は「ばしょ」を 見てないよ。「👀 どこ見た？」モードで 見れるよ</div>
+          <div class="jc-head"><span class="jc-name" id="t-place-name"></span><span class="jc-eff" id="t-place-eff"></span></div>
+          <div class="jc-bar-label" id="t-place-desc"></div>
         </div>
-        <div class="heatmap-note" style="margin-top:0.6rem;">※「ぎょぴっぽさ」= ぎょぴちゃんに どれだけ にてるか。「きいた」= その とくちょうが はんていに どれだけ きいたか。</div>
+        <div class="heatmap-note" id="t-jc-note" style="margin-top:0.6rem;"></div>
       </div>
 
-      <!-- 脳みそグラフ: あたまの中の描写(両モードで見た目が変わる) -->
       <div id="brain-section">
-        <div class="brain-title" id="brain-title">コンピュータの あたまの中</div>
+        <div class="brain-title" id="brain-title"></div>
         <canvas id="brain-canvas"></canvas>
         <div class="brain-cap" id="brain-cap"></div>
       </div>
 
-      <button class="reset-btn" onclick="reset()">↩ もう いちまい</button>
+      <button class="reset-btn" onclick="reset()" id="t-reset"></button>
     </div>
 
-    <div id="status">じゅんびちゅう<span class="loading-dots"></span></div>
+    <div id="status"></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
   <script>
-    let classifier = null;      // モードA: MobileNet埋込ベース
-    let featClassifier = null;  // モードB: 色/形 特徴ベース
-    let mobileNetModel = null;
-    let gyopiAvg = null;        // ぎょぴ群の特徴平均(一致%用)
-    let heatmapVisible = true;
-    let currentMode = 'A';
-    let resultShown = false;
-    let brainRAF = null;
+    let classifier = null, featClassifier = null, mobileNetModel = null, gyopiAvg = null;
+    let heatmapVisible = true, currentMode = 'A', resultShown = false, brainRAF = null, fromBundle = false;
+    let curLang = localStorage.getItem('judge-lang') || 'kid';
+    let last = null; // 最後の判定結果(言語切替の再描画用)
 
-    // モードB の とくちょう軸(子供語)
+    // ── 文言(こども/おとな 2セット) ──
     const AXES = [
-      { key: 'warmth',      icon: '🔥', label: 'いろの あたたかさ' },
-      { key: 'brightness',  icon: '☀️', label: 'あかるさ' },
-      { key: 'saturation',  icon: '🌈', label: 'あざやかさ' },
-      { key: 'edgeDensity', icon: '✏️', label: 'かたちの くっきり' },
-      { key: 'hueVariety',  icon: '🎨', label: 'いろの 多さ' },
+      { key:'warmth',      icon:'🔥', kid:'いろの あたたかさ', adult:'色の暖かさ' },
+      { key:'brightness',  icon:'☀️', kid:'あかるさ',          adult:'明るさ' },
+      { key:'saturation',  icon:'🌈', kid:'あざやかさ',        adult:'鮮やかさ' },
+      { key:'edgeDensity', icon:'✏️', kid:'かたちの くっきり',  adult:'輪郭のくっきり' },
+      { key:'hueVariety',  icon:'🎨', kid:'いろの 多さ',        adult:'色の多さ' },
     ];
     const FEATURE_KEYS = AXES.map(a => a.key);
 
-    // モデルは まず同梱ファイル(model/)、無ければ ローカル学習(IndexedDB)を読む
-    let fromBundle = false; // model/ 同梱から読めた = 公開版
+    const LANG = {
+      kid: {
+        title:'ぎょぴちゃん はんていマシン',
+        subtitle:'この えは ぎょぴちゃん かな？ コンピュータに きいてみよう！',
+        nav:'🎓 べんきょうページ',
+        upload:'えを ここに ドロップ してね<br>クリックして えらんでも いいよ',
+        modeA:'👀 どこ見た？', modeB:'🎨 なぜ？',
+        judge:'これ だれ？', judging:'みてるよ…',
+        legend:'🔴 コンピュータが よく見た ところ　/　① いちばんの てがかり',
+        note:'※ ほんとは いろも かたちも ぜんぶ 見てるよ。でも コンピュータの あたまの中は のぞけないんだ。だから「どこ」を 見たかだけ おしえてくれるよ。',
+        hideMap:'🗺️ ちずを かくす', showMap:'🗺️ ちずを みせる',
+        meterTitle:'コンピュータの じしん', reset:'↩ もう いちまい',
+        jcTitle:'どの とくちょうで きめた？ 🎨',
+        placeName:'📍 ばしょ', placeEff:'見てない',
+        placeDesc:'モードB は「ばしょ」を 見てないよ。「👀 どこ見た？」モードで 見れるよ',
+        jcNote:'※「ぎょぴっぽさ」= ぎょぴちゃんに どれだけ にてるか。「きいた」= その とくちょうが はんていに どれだけ きいたか。',
+        matchLabel:'ぎょぴっぽさ', effPrefix:'きいた ',
+        brainTitleA:'コンピュータの あたまの中（のぞけない）👀',
+        brainCapA:'脳細胞が 多すぎて 中は 見えないんだ。だから「どこを 見たか」だけ わかるよ。',
+        brainTitleB:'コンピュータの あたまの中（ほんもの）🎨',
+        brainCapB:'ひかる線 = いま はたらいてる ところ。ふとい線 = つよい つながり。',
+        stLoading:'じゅんびちゅう',
+        stNotrained:'さきに <a href="train.html">べんきょうページ</a> で コンピュータに おぼえさせてね',
+        stReady:'じゅんび できたよ！ えを いれてね 🐟',
+        stThinking:'コンピュータが かんがえてる… 🤔',
+        stDoneA:'できたよ！ どこを 見たか みてみてね 👀',
+        stDoneB:'できたよ！ どの とくちょうで きめたか みてみてね 🎨',
+        stNoModel:'まだ コンピュータが おぼえてないよ',
+        stModeBlocked:'🎨 モードは <a href="train.html">べんきょうページ</a> で おぼえてから つかえるよ',
+        verdict:{ yes:'ぎょぴちゃんだ！', maybe:'どっちかな？', no:'ちがうみたい' },
+        conf:['ぎょぴちゃんじゃない','ちがう…かな？','うーん、まよう…','ぎょぴちゃん…かな？','たぶん ぎょぴちゃん','ぜったい ぎょぴちゃん！'],
+      },
+      adult: {
+        title:'ぎょぴちゃん判定器',
+        subtitle:'この画像がぎょぴちゃんかどうか、AIに判定させます',
+        nav:'🎓 学習ページ',
+        upload:'画像をドラッグ＆ドロップ<br>またはクリックして選択',
+        modeA:'👀 どこを見た?', modeB:'🎨 なぜ?',
+        judge:'判定する', judging:'判定中…',
+        legend:'🔴 AIが注目した領域　/　① 最も影響した場所',
+        note:'※ 実際は色も形もすべて使っています。ただしモデル内部は解釈できないため、可視化できるのは「どこ」を見たか（位置）のみです。',
+        hideMap:'🗺️ マップを隠す', showMap:'🗺️ マップを表示',
+        meterTitle:'AIの確信度', reset:'↩ 別の画像',
+        jcTitle:'どの特徴で判定した? 🎨',
+        placeName:'📍 場所（位置）', placeEff:'未使用',
+        placeDesc:'モードBは位置情報を使いません。「👀 どこを見た?」モードで確認できます',
+        jcNote:'※「ぎょぴっぽさ」=ぎょぴちゃん平均との近さ（一致度）。「きいた」=その特徴が判定に与えた影響（寄与度・近似）。',
+        matchLabel:'ぎょぴっぽさ', effPrefix:'効き ',
+        brainTitleA:'AIの頭の中（のぞけない）👀',
+        brainCapA:'ニューロンが多すぎて内部は解釈できません。だから「どこを見たか」だけが分かります。',
+        brainTitleB:'AIの頭の中（解釈可能）🎨',
+        brainCapB:'光る線=活性中の経路。太い線=強い結合（重み大）。',
+        stLoading:'準備中',
+        stNotrained:'先に <a href="train.html">学習ページ</a> でモデルを学習させてください',
+        stReady:'準備完了。画像を入れてください 🐟',
+        stThinking:'AIが計算中… 🤔',
+        stDoneA:'完了。どこを見たか確認できます 👀',
+        stDoneB:'完了。どの特徴で判定したか確認できます 🎨',
+        stNoModel:'モデルが読み込まれていません',
+        stModeBlocked:'🎨 モードは <a href="train.html">学習ページ</a> で学習後に使えます',
+        verdict:{ yes:'ぎょぴちゃんです！', maybe:'どちらとも言えません', no:'ちがいます' },
+        conf:['ぎょぴちゃんではない','たぶん違う','判定に迷っています','ぎょぴちゃんかも','たぶんぎょぴちゃん','ほぼ確実にぎょぴちゃん'],
+      },
+    };
+    function L(key) { return LANG[curLang][key]; }
+
+    // 静的文言を一括適用
+    function applyLang() {
+      const x = LANG[curLang];
+      document.getElementById('t-title').textContent = x.title;
+      document.getElementById('t-subtitle').textContent = x.subtitle;
+      document.getElementById('nav-link').textContent = x.nav;
+      document.getElementById('t-upload').innerHTML = x.upload;
+      document.getElementById('t-modeA').textContent = x.modeA;
+      document.getElementById('mode-btn-b').textContent = x.modeB;
+      document.getElementById('judge-btn').textContent = x.judge;
+      document.getElementById('t-legend').textContent = x.legend;
+      document.getElementById('t-note').textContent = x.note;
+      document.getElementById('toggle-heatmap').textContent = heatmapVisible ? x.hideMap : x.showMap;
+      document.getElementById('t-meter-title').textContent = x.meterTitle;
+      document.getElementById('t-reset').textContent = x.reset;
+      document.getElementById('t-jc-title').textContent = x.jcTitle;
+      document.getElementById('t-place-name').textContent = x.placeName;
+      document.getElementById('t-place-eff').textContent = x.placeEff;
+      document.getElementById('t-place-desc').textContent = x.placeDesc;
+      document.getElementById('t-jc-note').textContent = x.jcNote;
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === curLang));
+      buildJudgeCardRows();
+      // 結果が出ていれば 最後の値で再描画(再計算なし)
+      if (resultShown && last) {
+        showResult(last.prob);
+        if (currentMode === 'A') { document.getElementById('brain-title').textContent = x.brainTitleA; document.getElementById('brain-cap').textContent = x.brainCapA; }
+        else { showJudgeCard(last.matchPct, last.effPct); document.getElementById('brain-title').textContent = x.brainTitleB; document.getElementById('brain-cap').textContent = x.brainCapB; }
+      }
+    }
+    function setLang(lang) { curLang = lang; localStorage.setItem('judge-lang', lang); applyLang(); }
+
     async function loadEither(name) {
       try { const m = await tf.loadLayersModel(`model/${name}/model.json`); fromBundle = true; return m; }
       catch (_) { return await tf.loadLayersModel(`indexeddb://${name}`); }
     }
     async function loadAvgFeatures() {
-      try {
-        const r = await fetch('model/gyopi-avg.json');
-        if (r.ok) { const j = await r.json(); if (j) return j; }
-      } catch (_) {}
+      try { const r = await fetch('model/gyopi-avg.json'); if (r.ok) { const j = await r.json(); if (j) return j; } } catch (_) {}
       return JSON.parse(localStorage.getItem('gyopi-avg-features') || 'null');
+    }
+    // 学習ページリンクは train.html が実在する時だけ出す(公開版は非表示)
+    async function setupNavLink() {
+      try { const r = await fetch('train.html', { method: 'HEAD' }); if (!r.ok) throw 0; }
+      catch (_) { const nav = document.getElementById('nav-link'); if (nav) nav.style.display = 'none'; }
     }
 
     async function loadModel() {
-      setStatus('じゅんびちゅう');
+      setStatus(L('stLoading'));
       try {
         classifier = await loadEither('gyopi-classifier');
         mobileNetModel = await mobilenet.load({ version: 1, alpha: 0.25 });
-        // モードB(任意): 無くてもモードAは動く
         try {
           featClassifier = await loadEither('gyopi-feature-classifier');
           gyopiAvg = await loadAvgFeatures();
         } catch (_) { featClassifier = null; }
-        if (!featClassifier || !gyopiAvg) {
-          document.getElementById('mode-btn-b').disabled = true;
-        }
-        buildJudgeCardRows();
-        if (fromBundle) { const nav = document.querySelector('.nav-link'); if (nav) nav.style.display = 'none'; }
-        setStatus('じゅんび できたよ！ えを いれてね 🐟');
+        if (!featClassifier || !gyopiAvg) document.getElementById('mode-btn-b').disabled = true;
+        setStatus(L('stReady'));
       } catch (e) {
-        setStatus('さきに <a href="train.html">べんきょうページ</a> で コンピュータに おぼえさせてね');
+        setStatus(L('stNotrained'));
       }
     }
 
     function buildJudgeCardRows() {
       document.getElementById('jc-rows').innerHTML = AXES.map((a, i) => `
         <div class="jc-row" id="jc-row-${i}">
-          <div class="jc-head">
-            <span class="jc-name">${a.icon} ${a.label}</span>
-            <span class="jc-eff" id="jc-eff-${i}">―</span>
-          </div>
-          <div class="jc-bar-label">ぎょぴっぽさ <b id="jc-match-${i}">―</b></div>
+          <div class="jc-head"><span class="jc-name">${a.icon} ${a[curLang]}</span><span class="jc-eff" id="jc-eff-${i}">―</span></div>
+          <div class="jc-bar-label">${L('matchLabel')} <b id="jc-match-${i}">―</b></div>
           <div class="jc-bar-bg"><div class="jc-bar-fill" id="jc-bar-${i}"></div></div>
         </div>`).join('');
     }
 
     function setMode(m) {
-      if (m === 'B' && (!featClassifier || !gyopiAvg)) {
-        setStatus('🎨 モードは <a href="train.html">べんきょうページ</a> で おぼえてから つかえるよ');
-        return;
-      }
+      if (m === 'B' && (!featClassifier || !gyopiAvg)) { setStatus(L('stModeBlocked')); return; }
       currentMode = m;
       document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === m));
-      if (resultShown) judge(); // 同じ画像を べつの見方で 見くらべる
+      if (resultShown) judge();
     }
 
     function setupUpload() {
-      document.getElementById('file-input').addEventListener('change', e => {
-        if (e.target.files[0]) showPreview(e.target.files[0]);
-      });
+      document.getElementById('file-input').addEventListener('change', e => { if (e.target.files[0]) showPreview(e.target.files[0]); });
       const area = document.getElementById('upload-area');
       area.addEventListener('dragover', e => { e.preventDefault(); area.classList.add('dragover'); });
       area.addEventListener('dragleave', () => area.classList.remove('dragover'));
-      area.addEventListener('drop', e => {
-        e.preventDefault(); area.classList.remove('dragover');
-        const file = e.dataTransfer.files[0];
-        if (file && file.type.startsWith('image/')) showPreview(file);
-      });
+      area.addEventListener('drop', e => { e.preventDefault(); area.classList.remove('dragover'); const f = e.dataTransfer.files[0]; if (f && f.type.startsWith('image/')) showPreview(f); });
     }
-
     function showPreview(file) {
       const reader = new FileReader();
       reader.onload = ev => {
@@ -360,51 +404,40 @@
     }
 
     async function judge() {
-      if (!classifier) { setStatus('まだ コンピュータが おぼえてないよ'); return; }
-      if (currentMode === 'B' && (!featClassifier || !gyopiAvg)) { setMode('A'); }
+      if (!classifier) { setStatus(L('stNoModel')); return; }
+      if (currentMode === 'B' && (!featClassifier || !gyopiAvg)) setMode('A');
       const img = document.getElementById('preview');
       if (currentMode === 'A') await judgeMobileNet(img);
       else await judgeFeature(img);
     }
 
-    // ── モードA: MobileNet + オクルージョン(どこ見た?) ──
     async function judgeMobileNet(img) {
       const btn = document.getElementById('judge-btn');
-      btn.disabled = true; btn.textContent = 'みてるよ…';
-
+      btn.disabled = true; btn.textContent = L('judging');
       const prob = tf.tidy(() => classifier.predict(mobileNetModel.infer(img, true)).dataSync()[1]);
-      showResult(prob);
+      last = { prob }; showResult(prob);
       document.getElementById('judge-card').style.display = 'none';
-
       document.getElementById('heatmap-canvas').style.display = 'none';
       document.getElementById('heatmap-info').style.display = 'none';
-      setStatus('コンピュータが かんがえてる… 🤔');
-
+      setStatus(L('stThinking'));
       const occResult = await computeOcclusionMap(img, prob);
       renderHeatmap(img, occResult);
-
       heatmapVisible = true;
       document.getElementById('heatmap-canvas').style.display = 'block';
       document.getElementById('heatmap-info').style.display = 'block';
-      document.getElementById('toggle-heatmap').textContent = '🗺️ ちずを かくす';
-
+      document.getElementById('toggle-heatmap').textContent = L('hideMap');
       renderBrainBlackbox(prob);
-
-      btn.disabled = false; btn.textContent = 'これ だれ？';
+      btn.disabled = false; btn.textContent = L('judge');
       resultShown = true;
-      setStatus('できたよ！ どこを 見たか みてみてね 👀');
+      setStatus(L('stDoneA'));
     }
 
-    // ── モードB: 色/形 特徴(なぜ?) ──
     async function judgeFeature(img) {
       const btn = document.getElementById('judge-btn');
-      btn.disabled = true; btn.textContent = 'みてるよ…';
-
+      btn.disabled = true; btn.textContent = L('judging');
       const feat = analyzeImageFeatures(img);
       const vec = FEATURE_KEYS.map(k => feat[k]);
       const prob = tf.tidy(() => featClassifier.predict(tf.tensor2d([vec])).dataSync()[1]);
-
-      // 効き%: 各軸を すこし動かして はんていが どれだけ変わるか(数値微分の近似)
       const eps = 0.06;
       const effects = FEATURE_KEYS.map((k, idx) => {
         const up = vec.slice(); up[idx] = Math.min(1, up[idx] + eps);
@@ -415,20 +448,16 @@
       });
       const effSum = effects.reduce((a, b) => a + b, 0) || 1;
       const effPct = effects.map(e => Math.round((e / effSum) * 100));
-
-      // 一致%(ぎょぴっぽさ): ぎょぴ平均との 近さ
       const matchPct = FEATURE_KEYS.map(k => Math.round((1 - Math.abs(feat[k] - gyopiAvg[k])) * 100));
-
+      last = { prob, matchPct, effPct, vec };
       showResult(prob);
-      // モードB は 場所マップを 隠す
       document.getElementById('heatmap-canvas').style.display = 'none';
       document.getElementById('heatmap-info').style.display = 'none';
       showJudgeCard(matchPct, effPct);
       renderBrainFeature(vec, prob, effPct);
-
-      btn.disabled = false; btn.textContent = 'これ だれ？';
+      btn.disabled = false; btn.textContent = L('judge');
       resultShown = true;
-      setStatus('できたよ！ どの とくちょうで きめたか みてみてね 🎨');
+      setStatus(L('stDoneB'));
     }
 
     function showJudgeCard(matchPct, effPct) {
@@ -436,7 +465,7 @@
       AXES.forEach((a, i) => {
         document.getElementById('jc-match-' + i).textContent = matchPct[i] + '%';
         const effEl = document.getElementById('jc-eff-' + i);
-        effEl.textContent = 'きいた ' + effPct[i] + '%';
+        effEl.textContent = L('effPrefix') + effPct[i] + '%';
         effEl.className = 'jc-eff' + (effPct[i] > 0 && effPct[i] >= maxEff * 0.8 ? ' strong' : '');
         document.getElementById('jc-row-' + i).classList.toggle('dim', effPct[i] < maxEff * 0.35);
         setTimeout(() => { document.getElementById('jc-bar-' + i).style.width = matchPct[i] + '%'; }, 60);
@@ -444,7 +473,6 @@
       document.getElementById('judge-card').style.display = 'block';
     }
 
-    // モードB用: 色/形の手作り特徴 5つ([0,1]レンジ)
     function analyzeImageFeatures(imgEl) {
       const S = 80;
       const canvas = document.createElement('canvas');
@@ -452,277 +480,177 @@
       const ctx = canvas.getContext('2d');
       ctx.drawImage(imgEl, 0, 0, S, S);
       const { data } = ctx.getImageData(0, 0, S, S);
-
       let warmSum = 0, brightSum = 0, satSum = 0;
-      const hueHist = new Float32Array(12);
-      const gray = new Float32Array(S * S);
-      const n = S * S;
-
+      const hueHist = new Float32Array(12), gray = new Float32Array(S * S), n = S * S;
       for (let i = 0; i < n; i++) {
         const r = data[i*4]/255, g = data[i*4+1]/255, b = data[i*4+2]/255;
         gray[i] = (r + g + b) / 3;
-        const max = Math.max(r,g,b), min = Math.min(r,g,b);
-        const l = (max + min) / 2;
-        const d = max - min;
+        const max = Math.max(r,g,b), min = Math.min(r,g,b), l = (max+min)/2, d = max-min;
         const s = d === 0 ? 0 : d / (1 - Math.abs(2*l - 1));
         let h = 0;
-        if (d !== 0) {
-          if (max === r) h = ((g-b)/d + 6) % 6 * 60;
-          else if (max === g) h = ((b-r)/d + 2) * 60;
-          else h = ((r-g)/d + 4) * 60;
-        }
-        warmSum += (h < 60 || h > 300) ? 1 : 0;
-        brightSum += l; satSum += s;
+        if (d !== 0) { if (max===r) h=((g-b)/d+6)%6*60; else if (max===g) h=((b-r)/d+2)*60; else h=((r-g)/d+4)*60; }
+        warmSum += (h < 60 || h > 300) ? 1 : 0; brightSum += l; satSum += s;
         hueHist[Math.floor(h/30) % 12] += 1;
       }
-
       let edgeSum = 0;
-      for (let y = 1; y < S-1; y++) {
-        for (let x = 1; x < S-1; x++) {
-          const gx = -gray[(y-1)*S+(x-1)] + gray[(y-1)*S+(x+1)] - 2*gray[y*S+(x-1)] + 2*gray[y*S+(x+1)] - gray[(y+1)*S+(x-1)] + gray[(y+1)*S+(x+1)];
-          const gy = -gray[(y-1)*S+(x-1)] - 2*gray[(y-1)*S+x] - gray[(y-1)*S+(x+1)] + gray[(y+1)*S+(x-1)] + 2*gray[(y+1)*S+x] + gray[(y+1)*S+(x+1)];
-          edgeSum += Math.sqrt(gx*gx + gy*gy);
-        }
+      for (let y = 1; y < S-1; y++) for (let x = 1; x < S-1; x++) {
+        const gx = -gray[(y-1)*S+(x-1)]+gray[(y-1)*S+(x+1)]-2*gray[y*S+(x-1)]+2*gray[y*S+(x+1)]-gray[(y+1)*S+(x-1)]+gray[(y+1)*S+(x+1)];
+        const gy = -gray[(y-1)*S+(x-1)]-2*gray[(y-1)*S+x]-gray[(y-1)*S+(x+1)]+gray[(y+1)*S+(x-1)]+2*gray[(y+1)*S+x]+gray[(y+1)*S+(x+1)];
+        edgeSum += Math.sqrt(gx*gx + gy*gy);
       }
-
       const hueNorm = Array.from(hueHist).map(v => v/n);
-      return {
-        warmth: warmSum/n,
-        brightness: brightSum/n,
-        saturation: satSum/n,
-        edgeDensity: Math.min(edgeSum / ((S-2)*(S-2)*0.5), 1),
-        hueVariety: hueNorm.filter(v => v > 0.03).length / 12,
-      };
+      return { warmth:warmSum/n, brightness:brightSum/n, saturation:satSum/n, edgeDensity:Math.min(edgeSum/((S-2)*(S-2)*0.5),1), hueVariety:hueNorm.filter(v=>v>0.03).length/12 };
     }
 
-    // ── 結果バッジ(3だん) + 自信メーター(6だん)。両モード共通 ──
     function showResult(prob) {
-      const pct = Math.round(prob * 100);
-      const badgeEl = document.getElementById('result-badge');
-      const verdictEl = document.getElementById('result-verdict');
-      const meterEl = document.getElementById('meter-text');
-      const bar = document.getElementById('bar-fill');
-
+      const pct = Math.round(prob * 100), x = LANG[curLang];
+      const badgeEl = document.getElementById('result-badge'), verdictEl = document.getElementById('result-verdict');
+      const meterEl = document.getElementById('meter-text'), bar = document.getElementById('bar-fill');
       let badge, cls, verdict, barClass;
-      if (prob >= 0.55) { badge = '🐟'; cls = 'yes'; verdict = 'ぎょぴちゃんだ！'; barClass = ''; }
-      else if (prob >= 0.45) { badge = '🤔'; cls = 'maybe'; verdict = 'どっちかな？'; barClass = 'mid'; }
-      else { badge = '🙅'; cls = 'no'; verdict = 'ちがうみたい'; barClass = 'low'; }
-
-      let conf;
-      if      (prob >= 0.90) conf = 'ぜったい ぎょぴちゃん！';
-      else if (prob >= 0.70) conf = 'たぶん ぎょぴちゃん';
-      else if (prob >= 0.55) conf = 'ぎょぴちゃん…かな？';
-      else if (prob >= 0.45) conf = 'うーん、まよう…';
-      else if (prob >= 0.30) conf = 'ちがう…かな？';
-      else                   conf = 'ぎょぴちゃんじゃない';
-
-      badgeEl.textContent = badge;
-      badgeEl.className = 'result-badge ' + cls;
-      verdictEl.textContent = verdict;
-      verdictEl.className = 'result-verdict ' + cls;
-      meterEl.textContent = conf;
+      if (prob >= 0.55) { badge='🐟'; cls='yes'; verdict=x.verdict.yes; barClass=''; }
+      else if (prob >= 0.45) { badge='🤔'; cls='maybe'; verdict=x.verdict.maybe; barClass='mid'; }
+      else { badge='🙅'; cls='no'; verdict=x.verdict.no; barClass='low'; }
+      let ci;
+      if (prob >= 0.90) ci=5; else if (prob >= 0.70) ci=4; else if (prob >= 0.55) ci=3;
+      else if (prob >= 0.45) ci=2; else if (prob >= 0.30) ci=1; else ci=0;
+      badgeEl.textContent = badge; badgeEl.className = 'result-badge ' + cls;
+      verdictEl.textContent = verdict; verdictEl.className = 'result-verdict ' + cls;
+      meterEl.textContent = x.conf[ci];
       document.getElementById('percent-big').textContent = pct + '%';
       bar.className = 'bar-fill ' + barClass;
       setTimeout(() => { bar.style.width = pct + '%'; }, 50);
       document.getElementById('result').style.display = 'block';
     }
 
-    // ---- 脳みそグラフ(あたまの中の描写) ----
+    async function computeOcclusionMap(img, baseProb, gridSize = 5) {
+      const scores = [], offscreen = document.createElement('canvas');
+      const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+      offscreen.width = w; offscreen.height = h;
+      const ctx = offscreen.getContext('2d'), cellW = w/gridSize, cellH = h/gridSize, tempImg = new Image();
+      for (let row = 0; row < gridSize; row++) for (let col = 0; col < gridSize; col++) {
+        ctx.drawImage(img, 0, 0, w, h); ctx.fillStyle = '#808080'; ctx.fillRect(col*cellW, row*cellH, cellW, cellH);
+        await new Promise(r => { tempImg.onload = r; tempImg.src = offscreen.toDataURL('image/jpeg', 0.85); });
+        const occProb = tf.tidy(() => classifier.predict(mobileNetModel.infer(tempImg, true)).dataSync()[1]);
+        scores.push(baseProb - occProb); await tf.nextFrame();
+      }
+      return { scores, gridSize };
+    }
+    function renderHeatmap(img, occResult) {
+      const { scores, gridSize } = occResult, canvas = document.getElementById('heatmap-canvas');
+      const w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, w, h);
+      const cellW = w/gridSize, cellH = h/gridSize, maxPos = Math.max(...scores.map(s => Math.max(0, s)), 0.001);
+      scores.forEach((score, i) => {
+        if (score <= 0) return;
+        const t = score / maxPos, green = Math.round(80 + (1 - t) * 130);
+        ctx.fillStyle = `rgba(255, ${green}, 40, ${0.25 + t * 0.55})`;
+        ctx.fillRect((i%gridSize)*cellW, Math.floor(i/gridSize)*cellH, cellW, cellH);
+      });
+      const top1 = scores.map((s,i) => ({s,i})).sort((a,b) => b.s - a.s)[0];
+      if (top1 && top1.s > 0) {
+        const cx = ((top1.i%gridSize)+0.5)*cellW, cy = (Math.floor(top1.i/gridSize)+0.5)*cellH, r = Math.min(cellW, cellH)*0.34;
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fillStyle = 'rgba(255,255,255,0.95)'; ctx.fill();
+        ctx.lineWidth = Math.max(2, r*0.12); ctx.strokeStyle = '#ff4040'; ctx.stroke();
+        ctx.fillStyle = '#ff4040'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.font = `bold ${Math.round(r*1.2)}px sans-serif`; ctx.fillText('1', cx, cy + r*0.05);
+      }
+    }
+    function toggleHeatmap() {
+      heatmapVisible = !heatmapVisible;
+      document.getElementById('heatmap-canvas').style.display = heatmapVisible ? 'block' : 'none';
+      document.getElementById('toggle-heatmap').textContent = heatmapVisible ? L('hideMap') : L('showMap');
+    }
+
+    // ── 脳みそグラフ ──
     let _brainDraw = null;
     function animateBrain(drawFn) {
-      cancelAnimationFrame(brainRAF);
-      _brainDraw = drawFn;
+      cancelAnimationFrame(brainRAF); _brainDraw = drawFn;
       const t0 = performance.now();
-      (function loop(now) {
-        if (_brainDraw !== drawFn) return; // モード切替で 古いループは止める
-        drawFn((now - t0) / 1000);
-        brainRAF = requestAnimationFrame(loop);
-      })(t0);
+      (function loop(now) { if (_brainDraw !== drawFn) return; drawFn((now - t0) / 1000); brainRAF = requestAnimationFrame(loop); })(t0);
     }
     function brainCtx() {
-      const section = document.getElementById('brain-section');
-      section.style.display = 'block';
+      const section = document.getElementById('brain-section'); section.style.display = 'block';
       const canvas = document.getElementById('brain-canvas');
-      const W = canvas.width = canvas.offsetWidth || 416;
-      const H = canvas.height = 230;
+      const W = canvas.width = canvas.offsetWidth || 416, H = canvas.height = 230;
       return { ctx: canvas.getContext('2d'), W, H };
     }
     function drawNode(ctx, p, r, fill, ring) {
-      ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI*2);
-      ctx.fillStyle = fill; ctx.fill();
+      ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI*2); ctx.fillStyle = fill; ctx.fill();
       if (ring) { ctx.lineWidth = 2.5; ctx.strokeStyle = '#ff7a8a'; ctx.stroke(); }
     }
     function drawPulse(ctx, a, b, phase) {
       const x = a.x + (b.x - a.x) * phase, y = a.y + (b.y - a.y) * phase;
-      ctx.beginPath(); ctx.arc(x, y, 2.4, 0, Math.PI*2);
-      ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.fill();
+      ctx.beginPath(); ctx.arc(x, y, 2.4, 0, Math.PI*2); ctx.fillStyle = 'rgba(255,255,255,0.92)'; ctx.fill();
     }
-
-    // モードB: ほんものの脳(5入力→8中間→こたえ)。実重みで線を描く。
     function renderBrainFeature(vec, prob, effPct) {
-      document.getElementById('brain-title').textContent = 'コンピュータの あたまの中（ほんもの）🎨';
-      document.getElementById('brain-cap').textContent = 'ひかる線 = いま はたらいてる ところ。ふとい線 = つよい つながり。';
-      const Wt = featClassifier.getWeights();
-      const W1 = Wt[0].arraySync(), b1 = Wt[1].arraySync(), W2 = Wt[2].arraySync();
-      const H1 = b1.length;
+      document.getElementById('brain-title').textContent = L('brainTitleB');
+      document.getElementById('brain-cap').textContent = L('brainCapB');
+      const Wt = featClassifier.getWeights(), W1 = Wt[0].arraySync(), b1 = Wt[1].arraySync(), W2 = Wt[2].arraySync(), H1 = b1.length;
       const hidden = b1.map((bj, j) => Math.max(0, vec.reduce((s, v, i) => s + v * W1[i][j], 0) + bj));
       const maxH = Math.max(...hidden, 0.001);
       let maxW1 = 0.001; for (const r of W1) for (const w of r) maxW1 = Math.max(maxW1, Math.abs(w));
       let maxW2 = 0.001; for (const r of W2) maxW2 = Math.max(maxW2, Math.abs(r[1]));
-      const strongAxis = effPct.indexOf(Math.max(...effPct));
-      const ICON = AXES.map(a => a.icon);
-
+      const strongAxis = effPct.indexOf(Math.max(...effPct)), ICON = AXES.map(a => a.icon);
       animateBrain((t) => {
-        const { ctx, W, H } = brainCtx();
-        ctx.clearRect(0, 0, W, H);
-        const pad = 26;
-        const xIn = W * 0.12, xMid = W * 0.5, xOut = W * 0.88;
-        const yAt = (i, n) => pad + i * (H - 2*pad) / Math.max(1, n - 1);
-        const inN = vec.length;
-        const inPos = vec.map((_, i) => ({ x: xIn, y: yAt(i, inN) }));
-        const midPos = hidden.map((_, j) => ({ x: xMid, y: yAt(j, H1) }));
-        const outPos = { x: xOut, y: H / 2 };
+        const { ctx, W, H } = brainCtx(); ctx.clearRect(0, 0, W, H);
+        const pad = 26, xIn = W*0.12, xMid = W*0.5, xOut = W*0.88, yAt = (i,n) => pad + i*(H-2*pad)/Math.max(1,n-1), inN = vec.length;
+        const inPos = vec.map((_, i) => ({ x:xIn, y:yAt(i,inN) })), midPos = hidden.map((_, j) => ({ x:xMid, y:yAt(j,H1) })), outPos = { x:xOut, y:H/2 };
         const pulse = (t % 1.6) / 1.6;
-
         for (let i = 0; i < inN; i++) for (let j = 0; j < H1; j++) {
-          const w = W1[i][j], a = Math.abs(w) / maxW1;
-          ctx.strokeStyle = (w >= 0 ? 'rgba(255,122,138,' : 'rgba(94,197,255,') + (0.06 + a * 0.4) + ')';
-          ctx.lineWidth = 0.5 + a * 2.2;
+          const w = W1[i][j], a = Math.abs(w)/maxW1;
+          ctx.strokeStyle = (w>=0?'rgba(255,122,138,':'rgba(94,197,255,')+(0.06+a*0.4)+')'; ctx.lineWidth = 0.5+a*2.2;
           ctx.beginPath(); ctx.moveTo(inPos[i].x, inPos[i].y); ctx.lineTo(midPos[j].x, midPos[j].y); ctx.stroke();
         }
         for (let j = 0; j < H1; j++) {
-          const w = W2[j][1], a = Math.abs(w) / maxW2;
-          ctx.strokeStyle = (w >= 0 ? 'rgba(255,122,138,' : 'rgba(94,197,255,') + (0.06 + a * 0.4) + ')';
-          ctx.lineWidth = 0.5 + a * 2.2;
+          const w = W2[j][1], a = Math.abs(w)/maxW2;
+          ctx.strokeStyle = (w>=0?'rgba(255,122,138,':'rgba(94,197,255,')+(0.06+a*0.4)+')'; ctx.lineWidth = 0.5+a*2.2;
           ctx.beginPath(); ctx.moveTo(midPos[j].x, midPos[j].y); ctx.lineTo(outPos.x, outPos.y); ctx.stroke();
         }
-        if (strongAxis >= 0) {
-          for (let j = 0; j < H1; j++) {
-            drawPulse(ctx, inPos[strongAxis], midPos[j], pulse);
-            drawPulse(ctx, midPos[j], outPos, pulse);
-          }
-        }
+        if (strongAxis >= 0) for (let j = 0; j < H1; j++) { drawPulse(ctx, inPos[strongAxis], midPos[j], pulse); drawPulse(ctx, midPos[j], outPos, pulse); }
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        inPos.forEach((p, i) => {
-          drawNode(ctx, p, 13, `rgba(79,209,181,${0.3 + Math.min(1, vec[i]) * 0.7})`, i === strongAxis);
-          ctx.font = '13px sans-serif'; ctx.fillText(ICON[i], p.x, p.y);
-        });
-        midPos.forEach((p, j) => drawNode(ctx, p, 8, `rgba(183,148,246,${0.2 + (hidden[j]/maxH) * 0.8})`, false));
-        drawNode(ctx, outPos, 18, `rgba(255,122,138,${0.3 + prob * 0.7})`, true);
-        ctx.font = '18px sans-serif'; ctx.fillText('🐟', outPos.x, outPos.y);
+        inPos.forEach((p, i) => { drawNode(ctx, p, 13, `rgba(79,209,181,${0.3+Math.min(1,vec[i])*0.7})`, i===strongAxis); ctx.font='13px sans-serif'; ctx.fillText(ICON[i], p.x, p.y); });
+        midPos.forEach((p, j) => drawNode(ctx, p, 8, `rgba(183,148,246,${0.2+(hidden[j]/maxH)*0.8})`, false));
+        drawNode(ctx, outPos, 18, `rgba(255,122,138,${0.3+prob*0.7})`, true); ctx.font='18px sans-serif'; ctx.fillText('🐟', outPos.x, outPos.y);
       });
     }
-
-    // モードA: のぞけない脳(でかい・もやもや大量ノード)
     function renderBrainBlackbox(prob) {
-      document.getElementById('brain-title').textContent = 'コンピュータの あたまの中（のぞけない）👀';
-      document.getElementById('brain-cap').textContent = '脳細胞が 多すぎて 中は 見えないんだ。だから「どこを 見たか」だけ わかるよ。';
+      document.getElementById('brain-title').textContent = L('brainTitleA');
+      document.getElementById('brain-cap').textContent = L('brainCapA');
       const cloud = [];
-      for (let k = 0; k < 40; k++) cloud.push({ rx: 0.30 + Math.random()*0.40, ry: 0.10 + Math.random()*0.80, r: 2 + Math.random()*4, ph: Math.random()*6.28 });
+      for (let k = 0; k < 40; k++) cloud.push({ rx:0.30+Math.random()*0.40, ry:0.10+Math.random()*0.80, r:2+Math.random()*4, ph:Math.random()*6.28 });
       animateBrain((t) => {
-        const { ctx, W, H } = brainCtx();
-        ctx.clearRect(0, 0, W, H);
-        const inP = { x: W*0.1, y: H/2 }, outP = { x: W*0.9, y: H/2 };
+        const { ctx, W, H } = brainCtx(); ctx.clearRect(0, 0, W, H);
+        const inP = { x:W*0.1, y:H/2 }, outP = { x:W*0.9, y:H/2 };
         cloud.forEach(c => {
           const a = 0.16 + 0.12*Math.sin(t*1.6 + c.ph);
           ctx.beginPath(); ctx.arc(c.rx*W, c.ry*H, c.r, 0, Math.PI*2);
           ctx.fillStyle = `rgba(138,147,171,${a})`; ctx.shadowBlur = 8; ctx.shadowColor = 'rgba(138,147,171,0.4)'; ctx.fill();
         });
-        ctx.shadowBlur = 0;
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        drawNode(ctx, inP, 16, 'rgba(94,197,255,0.85)', false);
-        ctx.font = '15px sans-serif'; ctx.fillText('🖼️', inP.x, inP.y);
-        drawNode(ctx, outP, 18, `rgba(255,122,138,${0.3 + prob*0.7})`, true);
-        ctx.font = '18px sans-serif'; ctx.fillText('🐟', outP.x, outP.y);
+        ctx.shadowBlur = 0; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        drawNode(ctx, inP, 16, 'rgba(94,197,255,0.85)', false); ctx.font='15px sans-serif'; ctx.fillText('🖼️', inP.x, inP.y);
+        drawNode(ctx, outP, 18, `rgba(255,122,138,${0.3+prob*0.7})`, true); ctx.font='18px sans-serif'; ctx.fillText('🐟', outP.x, outP.y);
         ctx.fillStyle = 'rgba(138,147,171,0.5)'; ctx.font = 'bold 26px sans-serif'; ctx.fillText('?', W*0.5, H*0.5);
       });
     }
 
-    // ---- オクルージョンマップ(どこを見たか) ----
-    async function computeOcclusionMap(img, baseProb, gridSize = 5) {
-      const scores = [];
-      const offscreen = document.createElement('canvas');
-      const w = img.naturalWidth || img.width;
-      const h = img.naturalHeight || img.height;
-      offscreen.width = w; offscreen.height = h;
-      const ctx = offscreen.getContext('2d');
-      const cellW = w/gridSize, cellH = h/gridSize;
-      const tempImg = new Image();
-
-      for (let row = 0; row < gridSize; row++) {
-        for (let col = 0; col < gridSize; col++) {
-          ctx.drawImage(img, 0, 0, w, h);
-          ctx.fillStyle = '#808080';
-          ctx.fillRect(col*cellW, row*cellH, cellW, cellH);
-          await new Promise(r => { tempImg.onload = r; tempImg.src = offscreen.toDataURL('image/jpeg', 0.85); });
-          const occProb = tf.tidy(() => classifier.predict(mobileNetModel.infer(tempImg, true)).dataSync()[1]);
-          scores.push(baseProb - occProb);
-          await tf.nextFrame();
-        }
-      }
-      return { scores, gridSize };
-    }
-
-    // 子供向け: 青(逆方向)は描かない。赤〜黄だけ。①だけ大きく。
-    function renderHeatmap(img, occResult) {
-      const { scores, gridSize } = occResult;
-      const canvas = document.getElementById('heatmap-canvas');
-      const w = img.naturalWidth || img.width;
-      const h = img.naturalHeight || img.height;
-      canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, w, h);
-      const cellW = w/gridSize, cellH = h/gridSize;
-      const maxPos = Math.max(...scores.map(s => Math.max(0, s)), 0.001);
-
-      scores.forEach((score, i) => {
-        if (score <= 0) return;
-        const t = score / maxPos;
-        const green = Math.round(80 + (1 - t) * 130);
-        ctx.fillStyle = `rgba(255, ${green}, 40, ${0.25 + t * 0.55})`;
-        const row = Math.floor(i/gridSize), col = i%gridSize;
-        ctx.fillRect(col*cellW, row*cellH, cellW, cellH);
-      });
-
-      const top1 = scores.map((s,i) => ({s,i})).sort((a,b) => b.s - a.s)[0];
-      if (top1 && top1.s > 0) {
-        const row = Math.floor(top1.i/gridSize), col = top1.i%gridSize;
-        const cx = (col+0.5)*cellW, cy = (row+0.5)*cellH;
-        const r = Math.min(cellW, cellH)*0.34;
-        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
-        ctx.fillStyle = 'rgba(255,255,255,0.95)'; ctx.fill();
-        ctx.lineWidth = Math.max(2, r*0.12); ctx.strokeStyle = '#ff4040'; ctx.stroke();
-        ctx.fillStyle = '#ff4040';
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.font = `bold ${Math.round(r*1.2)}px sans-serif`;
-        ctx.fillText('1', cx, cy + r*0.05);
-      }
-    }
-
-    function toggleHeatmap() {
-      heatmapVisible = !heatmapVisible;
-      document.getElementById('heatmap-canvas').style.display = heatmapVisible ? 'block' : 'none';
-      document.getElementById('toggle-heatmap').textContent = heatmapVisible ? '🗺️ ちずを かくす' : '🗺️ ちずを みせる';
-    }
-
     function reset() {
-      cancelAnimationFrame(brainRAF); _brainDraw = null;
-      ['preview-wrap','result','heatmap-info','judge-card','brain-section'].forEach(id => {
-        document.getElementById(id).style.display = 'none';
-      });
+      cancelAnimationFrame(brainRAF); _brainDraw = null; resultShown = false; last = null;
+      ['preview-wrap','result','heatmap-info','judge-card','brain-section'].forEach(id => { document.getElementById(id).style.display = 'none'; });
       document.getElementById('heatmap-canvas').style.display = 'none';
       document.getElementById('judge-btn').style.display = 'none';
       document.getElementById('mode-toggle').classList.remove('show');
       document.getElementById('file-input').value = '';
-      resultShown = false;
-      setStatus('じゅんび できたよ！ えを いれてね 🐟');
+      setStatus(L('stReady'));
     }
 
     function setStatus(msg) {
       const el = document.getElementById('status');
-      el.innerHTML = msg === 'じゅんびちゅう' ? msg + '<span class="loading-dots"></span>' : msg;
+      el.innerHTML = msg === L('stLoading') ? msg + '<span class="loading-dots"></span>' : msg;
     }
 
+    applyLang();
+    setupNavLink();
     setupUpload();
     loadModel();
   </script>
