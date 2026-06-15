@@ -136,6 +136,10 @@
     .brain-canvas-wrap { position:relative; }
     #brain-canvas { width:100%; display:block; background:#fbfcfe; border:1px solid var(--line); border-radius:14px; }
     .brain-note-overlay { display:none; position:absolute; left:8px; right:8px; bottom:8px; font-size:0.66rem; line-height:1.5; color:var(--ink); background:rgba(255,255,255,0.88); border-radius:10px; padding:0.45rem 0.6rem; text-align:left; box-shadow:0 2px 8px rgba(56,65,90,0.12); }
+    /* Material風ツールチップ */
+    .brain-tip { display:none; position:absolute; transform:translate(-50%,-100%); background:rgba(48,56,80,0.96); color:#fff; font-size:0.74rem; font-weight:700; padding:0.32rem 0.65rem; border-radius:8px; white-space:nowrap; pointer-events:none; z-index:6; box-shadow:0 4px 14px rgba(0,0,0,0.28); }
+    .brain-tip::after { content:''; position:absolute; left:50%; top:100%; transform:translateX(-50%); border:5px solid transparent; border-top-color:rgba(48,56,80,0.96); }
+    #brain-canvas { cursor:default; }
     .brain-cap { font-size:0.7rem; color:var(--ink-soft); text-align:center; margin-top:0.35rem; line-height:1.55; }
     .analysis-hint { font-size:0.8rem; color:var(--ink-soft); text-align:center; padding:2rem 1rem; }
   </style>
@@ -243,6 +247,7 @@
         <div class="brain-canvas-wrap">
           <canvas id="brain-canvas"></canvas>
           <div class="brain-note-overlay" id="brain-note-overlay"></div>
+          <div class="brain-tip" id="brain-tip"></div>
         </div>
         <div class="brain-cap" id="brain-cap"></div>
       </div>
@@ -308,6 +313,7 @@
         mapMake:'🗺️ ちずを つくる', mapYes:'ぎょぴちゃん', mapNo:'ちがう',
         mapNote:'🔴ぎょぴ と 🔵ちがう が べつの かたまりに 分かれたら、AIが ちがいを おぼえた しるし。ノードに さわると どの えか わかるよ。',
         mapStLoad:'えを よみこみ中…', mapStEmb:'AIが えを おぼえてる…', mapStLink:'にてる えを つないでる…', mapStDone:'できた！ ドラッグで うごかせるよ',
+        ndImg:'🖼️ いれた え', ndHidden:'🧠 のうさいぼう', ndOut:'🐟 ぎょぴ度', ndAxis:'とくちょう：',
       },
       adult: {
         title:'ぎょぴちゃん判定器', subtitle:'この画像がぎょぴちゃんかどうか、AIに判定させます',
@@ -346,6 +352,7 @@
         mapMake:'🗺️ 地図を生成', mapYes:'ぎょぴちゃん', mapNo:'ちがう',
         mapNote:'🔴ぎょぴと🔵ちがうがクラスタに分離していれば、AIが違いを学習できた証拠です。ノードにカーソルを合わせると画像名が出ます。',
         mapStLoad:'画像読み込み中…', mapStEmb:'埋め込み計算中…', mapStLink:'類似度で接続中…', mapStDone:'完了。ドラッグで操作できます',
+        ndImg:'🖼️ 入力画像', ndHidden:'🧠 ニューロン（中間層）', ndOut:'🐟 ぎょぴ確率', ndAxis:'特徴：',
       },
     };
     function L(key) { return LANG[curLang][key]; }
@@ -691,6 +698,14 @@
     }
 
     let _brainDraw = null;
+    let brainNodes = []; // ホバー判定用 {x,y,r,label}
+    function onBrainHover(e) {
+      const tip = document.getElementById('brain-tip');
+      let hit = null;
+      for (const n of brainNodes) { const dx = e.offsetX - n.x, dy = e.offsetY - n.y; if (dx*dx + dy*dy < (n.r + 5) * (n.r + 5)) { hit = n; break; } }
+      if (hit) { tip.textContent = hit.label; tip.style.left = hit.x + 'px'; tip.style.top = (hit.y - hit.r - 6) + 'px'; tip.style.display = 'block'; document.getElementById('brain-canvas').style.cursor = 'pointer'; }
+      else { tip.style.display = 'none'; document.getElementById('brain-canvas').style.cursor = 'default'; }
+    }
     function animateBrain(drawFn) {
       cancelAnimationFrame(brainRAF); _brainDraw = drawFn;
       const t0 = performance.now();
@@ -734,6 +749,10 @@
         inPos.forEach((p, i) => { drawNode(ctx, p, 12, `rgba(79,209,181,${0.3+Math.min(1,vec[i])*0.7})`, i===strongAxis); ctx.font='12px sans-serif'; ctx.fillText(ICON[i], p.x, p.y); });
         midPos.forEach((p, j) => drawNode(ctx, p, 7, `rgba(183,148,246,${0.2+(hidden[j]/maxH)*0.8})`, false));
         drawNode(ctx, outPos, 17, `rgba(255,122,138,${0.3+prob*0.7})`, true); ctx.font='17px sans-serif'; ctx.fillText('🐟', outPos.x, outPos.y);
+        brainNodes = [];
+        inPos.forEach((p, i) => brainNodes.push({ x:p.x, y:p.y, r:12, label: L('ndAxis') + AXES[i][curLang] }));
+        midPos.forEach(p => brainNodes.push({ x:p.x, y:p.y, r:7, label: L('ndHidden') }));
+        brainNodes.push({ x:outPos.x, y:outPos.y, r:17, label: L('ndOut') });
       });
     }
     function renderBrainBlackbox(prob) {
@@ -750,6 +769,7 @@
         drawNode(ctx, inP, 15, 'rgba(94,197,255,0.85)', false); ctx.font='14px sans-serif'; ctx.fillText('🖼️', inP.x, inP.y);
         drawNode(ctx, outP, 17, `rgba(255,122,138,${0.3+prob*0.7})`, true); ctx.font='17px sans-serif'; ctx.fillText('🐟', outP.x, outP.y);
         ctx.fillStyle = 'rgba(138,147,171,0.5)'; ctx.font = 'bold 24px sans-serif'; ctx.fillText('?', W*0.5, H*0.5);
+        brainNodes = [{ x:inP.x, y:inP.y, r:15, label:L('ndImg') }, { x:outP.x, y:outP.y, r:17, label:L('ndOut') }];
       });
     }
 
@@ -768,6 +788,9 @@
 
     applyLang();
     if (localStorage.getItem('judge-welcomed')) document.getElementById('welcome').classList.add('hide');
+    const _bc = document.getElementById('brain-canvas');
+    _bc.addEventListener('mousemove', onBrainHover);
+    _bc.addEventListener('mouseleave', () => { document.getElementById('brain-tip').style.display = 'none'; _bc.style.cursor = 'default'; });
     setupNavLink();
     setupUpload();
     loadModel();
