@@ -157,6 +157,7 @@
     <h1 id="t-title"></h1>
     <p class="subtitle" id="t-subtitle"></p>
     <a href="train.html" class="nav-link" id="nav-link"></a>
+    <a href="graph.html" class="nav-link" id="map-link" style="display:none;"></a>
   </div>
 
   <div class="card">
@@ -247,6 +248,7 @@
         title:'ぎょぴちゃん はんていマシン',
         subtitle:'この えは ぎょぴちゃん かな？ コンピュータに きいてみよう！',
         nav:'🎓 じぶんで AIに おしえる',
+        mapLink:'🗺️ AIの あたまの地図',
         upload:'えを ここに ドロップ してね<br>クリックして えらんでも いいよ',
         modeHead:'🤖 2人の AIが いるよ。どっちに きく？',
         modeA:'🧠 まるごと見るAI', modeB:'🎨 いろ・かたちAI',
@@ -279,6 +281,7 @@
         title:'ぎょぴちゃん判定器',
         subtitle:'この画像がぎょぴちゃんかどうか、AIに判定させます',
         nav:'🎓 学習ページ（自分でAIに教える）',
+        mapLink:'🗺️ 埋め込み地図（ネットワーク）',
         upload:'画像をドラッグ＆ドロップ<br>またはクリックして選択',
         modeHead:'🤖 別々のAIモデル。どちらで判定?',
         modeA:'🧠 全体認識AI', modeB:'🎨 色・形 特徴AI',
@@ -316,6 +319,7 @@
       document.getElementById('t-title').textContent = x.title;
       document.getElementById('t-subtitle').textContent = x.subtitle;
       document.getElementById('nav-link').textContent = x.nav;
+      document.getElementById('map-link').textContent = x.mapLink;
       document.getElementById('t-upload').innerHTML = x.upload;
       document.getElementById('t-mode-head').textContent = x.modeHead;
       document.getElementById('t-modeA').textContent = x.modeA;
@@ -351,9 +355,14 @@
       return JSON.parse(localStorage.getItem('gyopi-avg-features') || 'null');
     }
     // 学習ページリンクは train.html が実在する時だけ出す(公開版は非表示)
+    // 学習ページ・地図は training_data 必須(ローカルのみ)。train.html が在る時だけ出す
     async function setupNavLink() {
-      try { const r = await fetch('train.html', { method: 'HEAD' }); if (!r.ok) throw 0; }
-      catch (_) { const nav = document.getElementById('nav-link'); if (nav) nav.style.display = 'none'; }
+      try {
+        const r = await fetch('train.html', { method: 'HEAD' }); if (!r.ok) throw 0;
+        document.getElementById('map-link').style.display = 'inline-block';
+      } catch (_) {
+        const nav = document.getElementById('nav-link'); if (nav) nav.style.display = 'none';
+      }
     }
 
     async function loadModel() {
