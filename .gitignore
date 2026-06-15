@@ -1,0 +1,20 @@
+# 著作権のため 学習画像は公開しない
+training_data/
+
+# ローカル学習ページ(画像が必要なので公開サイトでは動かない)
+train.html
+
+# 開発・検証スクリプト
+debug_verify.mjs
+export_model.mjs
+verify_public.mjs
+shot_*.png
+
+# Playwright 学習キャッシュ
+.pw-profile/
+
+# 依存
+node_modules/
+
+# genshijin 圧縮の原本
+*.original.md
