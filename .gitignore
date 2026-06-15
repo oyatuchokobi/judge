@@ -10,6 +10,7 @@ debug_verify.mjs
 export_model.mjs
 verify_public.mjs
 verify_graph.mjs
+verify_model.mjs
 test_train.mjs
 shot_*.png
 

@@ -57,6 +57,11 @@
     .bubble-deco.b1 { width:70px; height:70px; background:#ffe3ec; top:30px; right:-22px; }
     .bubble-deco.b2 { width:44px; height:44px; background:#d8f3ff; bottom:24px; left:-16px; }
 
+    .model-badge-wrap { position:relative; z-index:1; text-align:center; margin-bottom:1rem; }
+    .model-badge { display:inline-block; font-size:0.78rem; font-weight:800; padding:0.32rem 0.95rem; border-radius:99px; background:#eef1f7; color:var(--ink); }
+    .reset-bundle-btn { font-size:0.72rem; font-weight:700; padding:0.32rem 0.85rem; border-radius:99px; border:1.5px solid var(--line); background:#fff; color:var(--ink-soft); cursor:pointer; font-family:inherit; margin-left:0.4rem; }
+    .reset-bundle-btn:hover { border-color:var(--coral); color:var(--coral); }
+
     .upload-area { position:relative; z-index:1; border:2.5px dashed #d8deea; border-radius:22px; padding:2.2rem 1.5rem; text-align:center; cursor:pointer; background:#fbfcfe; transition:all 0.25s; }
     .upload-area:hover, .upload-area.dragover { border-color:var(--mint); background:#f3fffb; box-shadow:0 0 0 5px rgba(79,209,181,0.10); }
     .upload-area input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; }
@@ -164,6 +169,11 @@
     <span class="bubble-deco b1"></span>
     <span class="bubble-deco b2"></span>
 
+    <div class="model-badge-wrap">
+      <span id="model-badge" class="model-badge"></span>
+      <button id="reset-bundle-btn" class="reset-bundle-btn" onclick="resetToBundle()" style="display:none;"></button>
+    </div>
+
     <div class="upload-area" id="upload-area">
       <input type="file" id="file-input" accept="image/*">
       <div class="upload-icon">🖼️</div>
@@ -229,7 +239,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js"></script>
   <script>
     let classifier = null, featClassifier = null, mobileNetModel = null, gyopiAvg = null;
-    let heatmapVisible = true, currentMode = 'A', resultShown = false, brainRAF = null, fromBundle = false;
+    let heatmapVisible = true, currentMode = 'A', resultShown = false, brainRAF = null;
+    let usingOwnModel = false; // true=自分の学習(IndexedDB) / false=同梱(お手本)
     let curLang = localStorage.getItem('judge-lang') || 'kid';
     let last = null; // 最後の判定結果(言語切替の再描画用)
 
@@ -249,6 +260,7 @@
         subtitle:'この えは ぎょぴちゃん かな？ コンピュータに きいてみよう！',
         nav:'🎓 じぶんで AIに おしえる',
         mapLink:'🗺️ AIの あたまの地図',
+        ownModel:'🧑 きみが おしえた AI', bundleModel:'📦 さいしょから の AI', resetBundle:'お手本に もどす',
         upload:'えを ここに ドロップ してね<br>クリックして えらんでも いいよ',
         modeHead:'🤖 2人の AIが いるよ。どっちに きく？',
         modeA:'🧠 まるごと見るAI', modeB:'🎨 いろ・かたちAI',
@@ -282,6 +294,7 @@
         subtitle:'この画像がぎょぴちゃんかどうか、AIに判定させます',
         nav:'🎓 学習ページ（自分でAIに教える）',
         mapLink:'🗺️ 埋め込み地図（ネットワーク）',
+        ownModel:'🧑 自分で学習したモデル', bundleModel:'📦 同梱モデル（お手本）', resetBundle:'お手本に戻す',
         upload:'画像をドラッグ＆ドロップ<br>またはクリックして選択',
         modeHead:'🤖 別々のAIモデル。どちらで判定?',
         modeA:'🧠 全体認識AI', modeB:'🎨 色・形 特徴AI',
@@ -336,6 +349,7 @@
       document.getElementById('t-place-desc').textContent = x.placeDesc;
       document.getElementById('t-jc-note').textContent = x.jcNote;
       document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === curLang));
+      updateModelBadge();
       buildJudgeCardRows();
       // 結果が出ていれば 最後の値で再描画(再計算なし)
       if (resultShown && last) {
@@ -346,15 +360,34 @@
     }
     function setLang(lang) { curLang = lang; localStorage.setItem('judge-lang', lang); applyLang(); }
 
-    async function loadEither(name) {
-      try { const m = await tf.loadLayersModel(`model/${name}/model.json`); fromBundle = true; return m; }
-      catch (_) { return await tf.loadLayersModel(`indexeddb://${name}`); }
+    // 判定モデルは「自分の学習(IndexedDB)を優先」→ 無ければ同梱(お手本)
+    async function loadEither(name, isPrimary) {
+      try { const m = await tf.loadLayersModel(`indexeddb://${name}`); if (isPrimary) usingOwnModel = true; return m; }
+      catch (_) { const m = await tf.loadLayersModel(`model/${name}/model.json`); if (isPrimary) usingOwnModel = false; return m; }
     }
     async function loadAvgFeatures() {
-      try { const r = await fetch('model/gyopi-avg.json'); if (r.ok) { const j = await r.json(); if (j) return j; } } catch (_) {}
-      return JSON.parse(localStorage.getItem('gyopi-avg-features') || 'null');
+      const local = JSON.parse(localStorage.getItem('gyopi-avg-features') || 'null');
+      if (local) return local;
+      try { const r = await fetch('model/gyopi-avg.json'); if (r.ok) return await r.json(); } catch (_) {}
+      return null;
     }
-    // 学習ページリンクは train.html が実在する時だけ出す(公開版は非表示)
+
+    // どっちのモデルを使ってるか表示
+    function updateModelBadge() {
+      const x = LANG[curLang];
+      const b = document.getElementById('model-badge');
+      if (b) b.textContent = usingOwnModel ? x.ownModel : x.bundleModel;
+      const r = document.getElementById('reset-bundle-btn');
+      if (r) { r.textContent = x.resetBundle; r.style.display = usingOwnModel ? 'inline-block' : 'none'; }
+    }
+    // 自分の学習を消して お手本に戻す
+    async function resetToBundle() {
+      try { await tf.io.removeModel('indexeddb://gyopi-classifier'); } catch (_) {}
+      try { await tf.io.removeModel('indexeddb://gyopi-feature-classifier'); } catch (_) {}
+      localStorage.removeItem('gyopi-avg-features');
+      location.reload();
+    }
+
     // 学習ページ・地図は training_data 必須(ローカルのみ)。train.html が在る時だけ出す
     async function setupNavLink() {
       try {
@@ -368,13 +401,14 @@
     async function loadModel() {
       setStatus(L('stLoading'));
       try {
-        classifier = await loadEither('gyopi-classifier');
+        classifier = await loadEither('gyopi-classifier', true);
         mobileNetModel = await mobilenet.load({ version: 1, alpha: 0.25 });
         try {
           featClassifier = await loadEither('gyopi-feature-classifier');
           gyopiAvg = await loadAvgFeatures();
         } catch (_) { featClassifier = null; }
         if (!featClassifier || !gyopiAvg) document.getElementById('mode-btn-b').disabled = true;
+        updateModelBadge();
         setStatus(L('stReady'));
       } catch (e) {
         setStatus(L('stNotrained'));
