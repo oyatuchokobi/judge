@@ -171,6 +171,7 @@
 
     <div class="model-badge-wrap">
       <span id="model-badge" class="model-badge"></span>
+      <button id="switch-model-btn" class="reset-bundle-btn" onclick="switchModel()" style="display:none;"></button>
       <button id="reset-bundle-btn" class="reset-bundle-btn" onclick="resetToBundle()" style="display:none;"></button>
     </div>
 
@@ -240,7 +241,9 @@
   <script>
     let classifier = null, featClassifier = null, mobileNetModel = null, gyopiAvg = null;
     let heatmapVisible = true, currentMode = 'A', resultShown = false, brainRAF = null;
-    let usingOwnModel = false; // true=自分の学習(IndexedDB) / false=同梱(お手本)
+    let usingOwnModel = false; // true=自分の学習 / false=お手本(同梱)
+    let modelSet = { own: null, bundle: null }; // 各 {classifier, featClassifier, gyopiAvg}
+    let currentSource = 'bundle';
     let curLang = localStorage.getItem('judge-lang') || 'kid';
     let last = null; // 最後の判定結果(言語切替の再描画用)
 
@@ -260,7 +263,8 @@
         subtitle:'この えは ぎょぴちゃん かな？ コンピュータに きいてみよう！',
         nav:'🎓 じぶんで AIに おしえる',
         mapLink:'🗺️ AIの あたまの地図',
-        ownModel:'🧑 きみが おしえた AI', bundleModel:'📦 さいしょから の AI', resetBundle:'お手本に もどす',
+        ownModel:'🧑 きみが おしえた AI', bundleModel:'📦 さいしょから の AI',
+        switchToBundle:'📦 お手本に きりかえ', switchToOwn:'🧑 じぶんのに きりかえ', resetBundle:'🗑️ 学習を けす',
         upload:'えを ここに ドロップ してね<br>クリックして えらんでも いいよ',
         modeHead:'🤖 2人の AIが いるよ。どっちに きく？',
         modeA:'🧠 まるごと見るAI', modeB:'🎨 いろ・かたちAI',
@@ -294,7 +298,8 @@
         subtitle:'この画像がぎょぴちゃんかどうか、AIに判定させます',
         nav:'🎓 学習ページ（自分でAIに教える）',
         mapLink:'🗺️ 埋め込み地図（ネットワーク）',
-        ownModel:'🧑 自分で学習したモデル', bundleModel:'📦 同梱モデル（お手本）', resetBundle:'お手本に戻す',
+        ownModel:'🧑 自分で学習したモデル', bundleModel:'📦 同梱モデル（お手本）',
+        switchToBundle:'📦 お手本に切替', switchToOwn:'🧑 自分のに切替', resetBundle:'🗑️ 学習を削除',
         upload:'画像をドラッグ＆ドロップ<br>またはクリックして選択',
         modeHead:'🤖 別々のAIモデル。どちらで判定?',
         modeA:'🧠 全体認識AI', modeB:'🎨 色・形 特徴AI',
@@ -360,27 +365,54 @@
     }
     function setLang(lang) { curLang = lang; localStorage.setItem('judge-lang', lang); applyLang(); }
 
-    // 判定モデルは「自分の学習(IndexedDB)を優先」→ 無ければ同梱(お手本)
-    async function loadEither(name, isPrimary) {
-      try { const m = await tf.loadLayersModel(`indexeddb://${name}`); if (isPrimary) usingOwnModel = true; return m; }
-      catch (_) { const m = await tf.loadLayersModel(`model/${name}/model.json`); if (isPrimary) usingOwnModel = false; return m; }
-    }
-    async function loadAvgFeatures() {
-      const local = JSON.parse(localStorage.getItem('gyopi-avg-features') || 'null');
-      if (local) return local;
-      try { const r = await fetch('model/gyopi-avg.json'); if (r.ok) return await r.json(); } catch (_) {}
-      return null;
+    // お手本(model/) と 自分の学習(IndexedDB) を 1セットずつ読み込む
+    async function loadSet(where) {
+      const idb = where === 'idb';
+      try {
+        const cls = idb ? await tf.loadLayersModel('indexeddb://gyopi-classifier')
+                        : await tf.loadLayersModel('model/gyopi-classifier/model.json');
+        let feat = null, avg = null;
+        try {
+          feat = idb ? await tf.loadLayersModel('indexeddb://gyopi-feature-classifier')
+                     : await tf.loadLayersModel('model/gyopi-feature-classifier/model.json');
+          avg = idb ? JSON.parse(localStorage.getItem('gyopi-avg-features') || 'null')
+                    : await fetch('model/gyopi-avg.json').then(r => r.ok ? r.json() : null).catch(() => null);
+        } catch (_) { feat = null; }
+        return { classifier: cls, featClassifier: feat, gyopiAvg: avg };
+      } catch (_) { return null; }
     }
 
-    // どっちのモデルを使ってるか表示
+    // 現在のソース(own/bundle)を実際に使うモデルに反映
+    function applyModel() {
+      const s = modelSet[currentSource];
+      classifier = s.classifier;
+      featClassifier = s.featClassifier;
+      gyopiAvg = s.gyopiAvg;
+      usingOwnModel = (currentSource === 'own');
+      document.getElementById('mode-btn-b').disabled = !(featClassifier && gyopiAvg);
+      updateModelBadge();
+    }
+
+    // 自分のAI ⇔ お手本AI を切り替え(消さずに行き来)
+    function switchModel() {
+      if (!(modelSet.own && modelSet.bundle)) return;
+      currentSource = currentSource === 'own' ? 'bundle' : 'own';
+      applyModel();
+      if (resultShown) judge();
+    }
+
+    // バッジ・切替ボタンの表示
     function updateModelBadge() {
-      const x = LANG[curLang];
+      const x = LANG[curLang], hasBoth = !!(modelSet.own && modelSet.bundle);
       const b = document.getElementById('model-badge');
       if (b) b.textContent = usingOwnModel ? x.ownModel : x.bundleModel;
+      const sw = document.getElementById('switch-model-btn');
+      if (sw) { sw.style.display = hasBoth ? 'inline-block' : 'none'; sw.textContent = usingOwnModel ? x.switchToBundle : x.switchToOwn; }
       const r = document.getElementById('reset-bundle-btn');
-      if (r) { r.textContent = x.resetBundle; r.style.display = usingOwnModel ? 'inline-block' : 'none'; }
+      if (r) { r.textContent = x.resetBundle; r.style.display = (usingOwnModel && hasBoth) ? 'inline-block' : 'none'; }
     }
-    // 自分の学習を消して お手本に戻す
+
+    // 自分の学習を完全に消して お手本だけに戻す
     async function resetToBundle() {
       try { await tf.io.removeModel('indexeddb://gyopi-classifier'); } catch (_) {}
       try { await tf.io.removeModel('indexeddb://gyopi-feature-classifier'); } catch (_) {}
@@ -401,14 +433,13 @@
     async function loadModel() {
       setStatus(L('stLoading'));
       try {
-        classifier = await loadEither('gyopi-classifier', true);
         mobileNetModel = await mobilenet.load({ version: 1, alpha: 0.25 });
-        try {
-          featClassifier = await loadEither('gyopi-feature-classifier');
-          gyopiAvg = await loadAvgFeatures();
-        } catch (_) { featClassifier = null; }
-        if (!featClassifier || !gyopiAvg) document.getElementById('mode-btn-b').disabled = true;
-        updateModelBadge();
+        modelSet.bundle = await loadSet('model'); // お手本(同梱)
+        modelSet.own = await loadSet('idb');       // 自分の学習(無ければ null)
+        if (!modelSet.bundle && !modelSet.own) throw new Error('no model');
+        // 自分の学習が在れば それを使う / 無ければ お手本
+        currentSource = modelSet.own ? 'own' : (modelSet.bundle ? 'bundle' : 'own');
+        applyModel();
         setStatus(L('stReady'));
       } catch (e) {
         setStatus(L('stNotrained'));
