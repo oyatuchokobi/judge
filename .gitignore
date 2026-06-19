@@ -8,10 +8,7 @@ graph.html
 # 開発・検証スクリプト
 debug_verify.mjs
 export_model.mjs
-verify_public.mjs
-verify_graph.mjs
-verify_model.mjs
-verify_dash.mjs
+verify_*.mjs
 test_train.mjs
 shot_*.png
 
