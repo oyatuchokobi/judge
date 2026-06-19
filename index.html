@@ -456,11 +456,16 @@
     function loadImageURL(url) { return new Promise((res, rej) => { const i = new Image(); i.crossOrigin = 'anonymous'; i.onload = () => res(i); i.onerror = rej; i.src = url; }); }
     function makeThumb(img) { const S = 56, c = document.createElement('canvas'); c.width = c.height = S; const x = c.getContext('2d'), m = Math.min(img.width, img.height); x.drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, S, S); return c.toDataURL('image/jpeg', 0.72); }
     function cosine(a, b) { let d = 0, na = 0, nb = 0; for (let i = 0; i < a.length; i++) { d += a[i] * b[i]; na += a[i] * a[i]; nb += b[i] * b[i]; } return d / (Math.sqrt(na) * Math.sqrt(nb) + 1e-9); }
+    async function loadMapData() {
+      const cached = JSON.parse(localStorage.getItem('gyopi-map-data') || 'null');
+      if (cached && cached.length) return cached;
+      return await fetch('map-data.json').then(r => r.ok ? r.json() : null).catch(() => null);
+    }
     async function makeMap() {
       const sp = document.getElementById('map-spinner'); sp.classList.add('show');
       try {
         let items, embeddings;
-        const cached = JSON.parse(localStorage.getItem('gyopi-map-data') || 'null');
+        const cached = await loadMapData();
         if (cached && cached.length) {
           // 学習時に保存された地図データ(即・計算なし)。自分の学習画像が反映される
           items = cached.map((d, i) => ({ yes: d.yes, thumb: d.thumb, f: '#' + (i + 1) }));
@@ -505,7 +510,9 @@
     }
 
     async function setupNavLink() {
-      const hasMapData = !!localStorage.getItem('gyopi-map-data');
+      const lsMap = !!localStorage.getItem('gyopi-map-data');
+      const bundledMap = await fetch('map-data.json', { method: 'HEAD' }).then(r => r.ok).catch(() => false);
+      const hasMapData = lsMap || bundledMap;
       let local = false;
       try { const r = await fetch('train.html', { method: 'HEAD' }); if (r.ok) local = true; } catch (_) {}
       if (!local) { const nav = document.getElementById('nav-link'); if (nav) nav.style.display = 'none'; }
