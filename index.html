@@ -269,6 +269,8 @@
     let heatmapVisible = true, currentMode = 'A', resultShown = false, brainRAF = null;
     let usingOwnModel = false;
     let modelSet = { own: null, bundle: null };
+    let subjectName = 'りんご';
+    function tpl(s) { return typeof s === 'string' ? s.replaceAll('{name}', subjectName) : s; }
     let currentSource = 'bundle';
     let curLang = localStorage.getItem('judge-lang') || 'kid';
     let last = null;
@@ -284,7 +286,7 @@
 
     const LANG = {
       kid: {
-        title:'ぎょぴちゃん はんていマシン', subtitle:'この えは ぎょぴちゃん かな？ コンピュータに きいてみよう！',
+        title:'{name} はんていマシン', subtitle:'この えは {name} かな？ コンピュータに きいてみよう！',
         nav:'🎓 おしえる',
         ownModel:'🧑 きみの AI', bundleModel:'📦 お手本 AI',
         switchToBundle:'📦 お手本へ', switchToOwn:'🧑 じぶんへ', resetBundle:'🗑️ けす',
@@ -298,8 +300,8 @@
         jcTitle:'どの とくちょうで きめた？ 🎨',
         placeName:'📍 ばしょ', placeEff:'見てない',
         placeDesc:'モードB は「ばしょ」を 見てないよ。「🧠まるごと見るAI」で 見れるよ',
-        jcNote:'※「ぎょぴっぽさ」= ぎょぴちゃんに どれだけ にてるか。「きいた」= その とくちょうが はんていに どれだけ きいたか。',
-        matchLabel:'ぎょぴっぽさ', effPrefix:'きいた ',
+        jcNote:'※「{name}っぽさ」= {name}に どれだけ にてるか。「きいた」= その とくちょうが はんていに どれだけ きいたか。',
+        matchLabel:'{name}っぽさ', effPrefix:'きいた ',
         brainTitleA:'あたまの中（のぞけない）👀',
         brainCapA:'人間の あたまみたいに、ちいさな のうさいぼう（ニューロン）が いっぱい あつまってるよ。多すぎて 中は 見えないんだ。',
         brainTitleB:'あたまの中（ほんもの）🎨',
@@ -313,17 +315,17 @@
         stDoneB:'できたよ！ どの とくちょうで きめたか みてみてね 🎨',
         stNoModel:'まだ コンピュータが おぼえてないよ',
         stModeBlocked:'🎨 モードは <a href="train.html">べんきょうページ</a> で おぼえてから つかえるよ',
-        verdict:{ yes:'ぎょぴちゃんだ！', maybe:'どっちかな？', no:'ちがうみたい' },
-        conf:['ぎょぴちゃんじゃない','ちがう…かな？','うーん、まよう…','ぎょぴちゃん…かな？','たぶん ぎょぴちゃん','ぜったい ぎょぴちゃん！'],
+        verdict:{ yes:'{name}だ！', maybe:'どっちかな？', no:'ちがうみたい' },
+        conf:['{name}じゃない','ちがう…かな？','うーん、まよう…','{name}…かな？','たぶん {name}','ぜったい {name}！'],
         mapTitle:'🗺️ AIの あたまの地図',
         mapDesc:'🧠 まるごと見るAIが「にてる」と 思った えが、ちかくに あつまるよ。',
-        mapMake:'🗺️ ちずを つくる', mapYes:'ぎょぴちゃん', mapNo:'ちがう',
-        mapNote:'🔴ぎょぴ と 🔵ちがう が べつの かたまりに 分かれたら、AIが ちがいを おぼえた しるし。ノードに さわると どの えか わかるよ。',
+        mapMake:'🗺️ ちずを つくる', mapYes:'{name}', mapNo:'ちがう',
+        mapNote:'🔴{name} と 🔵ちがう が べつの かたまりに 分かれたら、AIが ちがいを おぼえた しるし。ノードに さわると どの えか わかるよ。',
         mapStLoad:'えを よみこみ中…', mapStEmb:'AIが えを おぼえてる…', mapStLink:'にてる えを つないでる…', mapStDone:'できた！ ドラッグで うごかせるよ',
-        ndImg:'🖼️ いれた え', ndHidden:'🧠 のうさいぼう', ndOut:'🐟 ぎょぴ度', ndAxis:'とくちょう：',
+        ndImg:'🖼️ いれた え', ndHidden:'🧠 のうさいぼう', ndOut:'🐟 {name}度', ndAxis:'とくちょう：',
       },
       adult: {
-        title:'ぎょぴちゃん判定器', subtitle:'この画像がぎょぴちゃんかどうか、AIに判定させます',
+        title:'{name}判定器', subtitle:'この画像が{name}かどうか、AIに判定させます',
         nav:'🎓 学習',
         ownModel:'🧑 自分のモデル', bundleModel:'📦 お手本モデル',
         switchToBundle:'📦 お手本へ', switchToOwn:'🧑 自分へ', resetBundle:'🗑️ 削除',
@@ -337,8 +339,8 @@
         jcTitle:'どの特徴で判定した? 🎨',
         placeName:'📍 場所（位置）', placeEff:'未使用',
         placeDesc:'モードBは位置情報を使いません。「🧠全体認識AI」で確認できます',
-        jcNote:'※「ぎょぴっぽさ」=ぎょぴちゃん平均との近さ（一致度）。「きいた」=その特徴が判定に与えた影響（寄与度・近似）。',
-        matchLabel:'ぎょぴっぽさ', effPrefix:'効き ',
+        jcNote:'※「{name}っぽさ」={name}平均との近さ（一致度）。「きいた」=その特徴が判定に与えた影響（寄与度・近似）。',
+        matchLabel:'{name}っぽさ', effPrefix:'効き ',
         brainTitleA:'AIの頭の中（のぞけない）👀',
         brainCapA:'人間の脳と同じように、無数のニューロン（神経細胞）が組み合わさっています。多すぎて内部は解釈できません。',
         brainTitleB:'AIの頭の中（解釈可能）🎨',
@@ -352,31 +354,31 @@
         stDoneB:'完了。どの特徴で判定したか確認できます 🎨',
         stNoModel:'モデルが読み込まれていません',
         stModeBlocked:'🎨 モードは <a href="train.html">学習ページ</a> で学習後に使えます',
-        verdict:{ yes:'ぎょぴちゃんです！', maybe:'どちらとも言えません', no:'ちがいます' },
-        conf:['ぎょぴちゃんではない','たぶん違う','判定に迷っています','ぎょぴちゃんかも','たぶんぎょぴちゃん','ほぼ確実にぎょぴちゃん'],
+        verdict:{ yes:'{name}です！', maybe:'どちらとも言えません', no:'ちがいます' },
+        conf:['{name}ではない','たぶん違う','判定に迷っています','{name}かも','たぶん{name}','ほぼ確実に{name}'],
         mapTitle:'🗺️ 埋め込み地図',
         mapDesc:'🧠 全体認識AI(MobileNet)が似ていると判断した画像が近くに集まります。',
-        mapMake:'🗺️ 地図を生成', mapYes:'ぎょぴちゃん', mapNo:'ちがう',
-        mapNote:'🔴ぎょぴと🔵ちがうがクラスタに分離していれば、AIが違いを学習できた証拠です。ノードにカーソルを合わせると画像名が出ます。',
+        mapMake:'🗺️ 地図を生成', mapYes:'{name}', mapNo:'ちがう',
+        mapNote:'🔴{name}と🔵ちがうがクラスタに分離していれば、AIが違いを学習できた証拠です。ノードにカーソルを合わせると画像名が出ます。',
         mapStLoad:'画像読み込み中…', mapStEmb:'埋め込み計算中…', mapStLink:'類似度で接続中…', mapStDone:'完了。ドラッグで操作できます',
-        ndImg:'🖼️ 入力画像', ndHidden:'🧠 ニューロン（中間層）', ndOut:'🐟 ぎょぴ確率', ndAxis:'特徴：',
+        ndImg:'🖼️ 入力画像', ndHidden:'🧠 ニューロン（中間層）', ndOut:'🐟 {name}確率', ndAxis:'特徴：',
       },
     };
-    function L(key) { return LANG[curLang][key]; }
+    function L(key) { return tpl(LANG[curLang][key]); }
 
     function startApp() { localStorage.setItem('judge-welcomed', '1'); document.getElementById('welcome').classList.add('hide'); }
 
     function applyLang() {
       const x = LANG[curLang];
-      document.getElementById('w-title').textContent = x.title;
-      document.getElementById('w-subtitle').textContent = x.subtitle;
-      document.getElementById('t-tb-title').textContent = x.title;
-      document.getElementById('nav-link').textContent = x.nav;
-      document.getElementById('t-map-title').textContent = x.mapTitle;
-      document.getElementById('t-map-desc').textContent = x.mapDesc;
-      document.getElementById('t-map-yes').textContent = x.mapYes;
-      document.getElementById('t-map-no').textContent = x.mapNo;
-      document.getElementById('t-map-note').textContent = x.mapNote;
+      document.getElementById('w-title').textContent = L('title');
+      document.getElementById('w-subtitle').textContent = L('subtitle');
+      document.getElementById('t-tb-title').textContent = L('title');
+      document.getElementById('nav-link').textContent = L('nav');
+      document.getElementById('t-map-title').textContent = L('mapTitle');
+      document.getElementById('t-map-desc').textContent = L('mapDesc');
+      document.getElementById('t-map-yes').textContent = L('mapYes');
+      document.getElementById('t-map-no').textContent = L('mapNo');
+      document.getElementById('t-map-note').textContent = L('mapNote');
       document.getElementById('t-upload').innerHTML = x.upload;
       document.getElementById('t-modeA').textContent = x.modeA;
       document.getElementById('mode-btn-b').textContent = x.modeB;
@@ -411,13 +413,19 @@
           feat = idb ? await tf.loadLayersModel('indexeddb://gyopi-feature-classifier') : await tf.loadLayersModel('model/gyopi-feature-classifier/model.json');
           avg = idb ? JSON.parse(localStorage.getItem('gyopi-avg-features') || 'null') : await fetch('model/gyopi-avg.json').then(r => r.ok ? r.json() : null).catch(() => null);
         } catch (_) { feat = null; }
-        return { classifier: cls, featClassifier: feat, gyopiAvg: avg };
+        const name = idb
+          ? (localStorage.getItem('subject-name') || null)
+          : await fetch('model/meta.json').then(r => r.ok ? r.json() : null).then(m => m && m.name).catch(() => null);
+        return { classifier: cls, featClassifier: feat, gyopiAvg: avg, name };
       } catch (_) { return null; }
     }
     function applyModel() {
       const s = modelSet[currentSource];
       classifier = s.classifier; featClassifier = s.featClassifier; gyopiAvg = s.gyopiAvg;
       usingOwnModel = (currentSource === 'own');
+      subjectName = s.name || 'りんご';
+      applyLang();
+      buildJudgeCardRows();
       document.getElementById('mode-btn-b').disabled = !(featClassifier && gyopiAvg);
       updateModelBadge();
     }
@@ -661,15 +669,15 @@
       const badgeEl = document.getElementById('result-badge'), verdictEl = document.getElementById('result-verdict');
       const meterEl = document.getElementById('meter-text'), bar = document.getElementById('bar-fill');
       let badge, cls, verdict, barClass;
-      if (prob >= 0.55) { badge='🐟'; cls='yes'; verdict=x.verdict.yes; barClass=''; }
-      else if (prob >= 0.45) { badge='🤔'; cls='maybe'; verdict=x.verdict.maybe; barClass='mid'; }
-      else { badge='🙅'; cls='no'; verdict=x.verdict.no; barClass='low'; }
+      if (prob >= 0.55) { badge='🐟'; cls='yes'; verdict=tpl(x.verdict.yes); barClass=''; }
+      else if (prob >= 0.45) { badge='🤔'; cls='maybe'; verdict=tpl(x.verdict.maybe); barClass='mid'; }
+      else { badge='🙅'; cls='no'; verdict=tpl(x.verdict.no); barClass='low'; }
       let ci;
       if (prob >= 0.90) ci=5; else if (prob >= 0.70) ci=4; else if (prob >= 0.55) ci=3;
       else if (prob >= 0.45) ci=2; else if (prob >= 0.30) ci=1; else ci=0;
       badgeEl.textContent = badge; badgeEl.className = 'result-badge ' + cls;
       verdictEl.textContent = verdict; verdictEl.className = 'result-verdict ' + cls;
-      meterEl.textContent = x.conf[ci];
+      meterEl.textContent = tpl(x.conf[ci]);
       document.getElementById('percent-big').textContent = pct + '%';
       bar.className = 'bar-fill ' + barClass;
       setTimeout(() => { bar.style.width = pct + '%'; }, 50);
@@ -805,6 +813,10 @@
 
     function setStatus(msg) { const el = document.getElementById('status'); el.innerHTML = msg === L('stLoading') ? msg + '<span class="loading-dots"></span>' : msg; }
 
+    subjectName = localStorage.getItem('subject-name') || 'りんご';
+    if (!localStorage.getItem('subject-name')) {
+      fetch('model/meta.json').then(r => r.ok ? r.json() : null).then(m => { if (m && m.name) { subjectName = m.name; applyLang(); buildJudgeCardRows(); } }).catch(() => {});
+    }
     applyLang();
     if (localStorage.getItem('judge-welcomed')) document.getElementById('welcome').classList.add('hide');
     const _bc = document.getElementById('brain-canvas');
